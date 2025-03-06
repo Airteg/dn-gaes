@@ -11,13 +11,7 @@
     "plugin:react-native/all",
     "plugin:prettier/recommended"
   ],
-  "plugins": [
-    "react",
-    "react-native",
-    "prettier",
-    "@emotion",
-    "markdown"
-  ],
+  "plugins": ["react", "react-native", "prettier", "@emotion", "markdown"],
   "overrides": [
     {
       "files": ["*.md"],
@@ -47,8 +41,6 @@
         "endOfLine": "auto"
       }
     ],
-    "react-native/no-color-literals": "off",
-    "react-native/sort-styles": "off",
     "@emotion/jsx-import": "error",
     "@emotion/pkg-renaming": "error",
     "react/react-in-jsx-scope": "off",
