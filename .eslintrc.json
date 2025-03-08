@@ -8,10 +8,9 @@
     "next/core-web-vitals",
     "eslint:recommended",
     "plugin:react/recommended",
-    "plugin:react-native/all",
     "plugin:prettier/recommended"
   ],
-  "plugins": ["react", "react-native", "prettier", "@emotion", "markdown"],
+  "plugins": ["react", "prettier", "@emotion", "markdown"],
   "overrides": [
     {
       "files": ["*.md"],
@@ -44,7 +43,6 @@
     "@emotion/jsx-import": "error",
     "@emotion/pkg-renaming": "error",
     "react/react-in-jsx-scope": "off",
-    "react-native/no-inline-styles": "off",
     "react/prop-types": "off"
   },
   "settings": {
