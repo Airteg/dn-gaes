@@ -25,12 +25,14 @@ export async function POST(req) {
   user.resetPasswordExpires = Date.now() + 3600000; // 1 година
   await user.save();
 
-  // Симуляція відправки email (в реальному додатку треба підключити email-сервіс)
-  console.log(
-    `🔗 Посилання для відновлення пароля: http://localhost:3000/reset-password?token=${resetToken}`,
-  );
+  // Використовуємо BASE_URL з .env
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
+
+  console.log(`🔗 Посилання для відновлення пароля: ${resetLink}`);
 
   return NextResponse.json({
     message: "Перевірте email для відновлення пароля",
+    resetLink,
   });
 }
