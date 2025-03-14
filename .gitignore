@@ -46,3 +46,5 @@ next-env.d.ts
 /public/temp/
 /public/storage/
 /public/storage/metadataDoc.json
+
+/public/documents/

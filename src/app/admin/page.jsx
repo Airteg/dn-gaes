@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import UploadDocument from "@/components/admin/UploadDocument";
 import { fetchWithAuth } from "@/utils/fetchWithAuth";
 
 export default function AdminDocuments() {
@@ -149,6 +150,9 @@ export default function AdminDocuments() {
               setNewDocument({ ...newDocument, subcategory: e.target.value })
             }
             className="border p-2 w-full mb-2"
+          />
+          <UploadDocument
+            onUpload={(filePath) => setDocuments([...documents, { filePath }])}
           />
           <button
             onClick={handleAddDocument}

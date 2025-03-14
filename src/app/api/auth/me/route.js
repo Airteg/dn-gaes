@@ -5,7 +5,7 @@ import connectToDatabase from "@/utils/db";
 
 async function handler(req) {
   await connectToDatabase();
-  const user = await User.findById(req.user.id).select("-password"); // Вилучаємо пароль
+  const user = await User.findById(req.user.id).select("-password");
 
   if (!user) {
     return NextResponse.json(
