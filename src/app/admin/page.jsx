@@ -6,7 +6,7 @@ import UploadDocument from "@/components/admin/UploadDocument";
 import fetchWithAuth from "@/utils/fetchWithAuth";
 
 export default function AdminDocuments() {
-  const { token } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [documents, setDocuments] = useState([]);
   const [sortField, setSortField] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
@@ -28,7 +28,7 @@ export default function AdminDocuments() {
 
   const fetchDocuments = async () => {
     const data = await fetchWithAuth("/api/documents");
-    setDocuments(data);
+    if (data) setDocuments(data);
   };
 
   const handleSort = (field) => {
@@ -55,9 +55,10 @@ export default function AdminDocuments() {
 
     console.log("📌 response:", response); // Переконуємось, що response вже JSON
 
-    if (response.error) {
-      // Якщо сервер повернув { error: "Помилка" }
-      console.error("❌ Помилка оновлення документа:", response.error);
+    if (!response) {
+      console.error(
+        "❌ Помилка оновлення документа: Немає відповіді від сервера",
+      );
       return;
     }
 
@@ -67,18 +68,24 @@ export default function AdminDocuments() {
 
   const handleAddDocument = async () => {
     console.log("📤 Відправка нового документа:", newDocument);
+
     const response = await fetchWithAuth("/api/documents", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newDocument),
     });
+
+    const data = await response.json(); // ✅ Парсимо JSON тут
+
     if (!response.ok) {
       console.error(
         "❌ Помилка при додаванні документа:",
-        await response.text(),
+        data.error || "Невідома помилка",
       );
       return;
     }
+
+    console.log("✅ Документ успішно додано:", data);
     fetchDocuments();
     setIsAdding(false);
     setNewDocument({
@@ -154,7 +161,13 @@ export default function AdminDocuments() {
             className="border p-2 w-full mb-2"
           />
           <UploadDocument
-            onUpload={(filePath) => setDocuments([...documents, { filePath }])}
+            onUpload={(filePath) => {
+              console.log("📌 Отриманий filePath:", filePath);
+              setNewDocument((prev) => {
+                console.log("📌 Оновлений newDocument:", { ...prev, filePath }); // ЛОГ ДЛЯ ПЕРЕВІРКИ
+                return { ...prev, filePath };
+              });
+            }}
           />
           <button
             onClick={handleAddDocument}
@@ -220,6 +233,9 @@ export default function AdminDocuments() {
 }
 const EditableCell = ({ doc, field, onUpdate }) => {
   const [value, setValue] = useState(doc[field]);
+  useEffect(() => {
+    setValue(doc[field]);
+  }, [doc, field]);
 
   return (
     <td className="p-2 border">
@@ -239,7 +255,7 @@ const ToggleCell = ({ doc, field, onUpdate }) => (
       className={`px-2 py-1 rounded ${
         doc[field] ? "bg-green-500 text-white" : "bg-gray-300"
       }`}
-      onClick={() => onUpdate(doc._id, field, !doc[field])}
+      onClick={() => onUpdate && onUpdate(doc._id, field, !doc[field])}
     >
       {doc[field] ? "✓" : "✗"}
     </button>

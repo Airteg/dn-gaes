@@ -28,7 +28,9 @@ export default function UploadDocument({ onUpload }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Помилка завантаження");
 
-      onUpload(data.filePath); // Оновлюємо список документів
+      console.log("📌 Завантажений файл:", data.filePath); // ЛОГ
+
+      onUpload(data.filePath); // Передаємо шлях до файлу
     } catch (err) {
       setError(err.message);
     } finally {
