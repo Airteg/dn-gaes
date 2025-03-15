@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "@/app/providers/AuthProvider";
 import UploadDocument from "@/components/admin/UploadDocument";
@@ -23,8 +22,10 @@ export default function AdminDocuments() {
   });
 
   useEffect(() => {
-    fetchDocuments();
-  }, []);
+    setNewDocument((prev) => ({ ...prev, uploadedBy: user?._id }));
+  }, [user]);
+
+  useEffect(() => fetchDocuments(), []);
 
   const fetchDocuments = async () => {
     const data = await fetchWithAuth("/api/documents");
@@ -46,14 +47,17 @@ export default function AdminDocuments() {
   };
 
   const handleUpdate = async (id, field, value) => {
-    console.log(`🔄 Оновлення документа ${id}: ${field} ->`, value);
+    console.log(
+      `🔄 handleUpdate->Оновлення документа ${id}: ${field} ->`,
+      value,
+    );
 
     const response = await fetchWithAuth(`/api/documents/${id}`, {
       method: "PATCH",
       body: JSON.stringify({ [field]: value }),
     });
 
-    console.log("📌 response:", response); // Переконуємось, що response вже JSON
+    console.log("📌 handleUpdate->response:", response); // Переконуємось, що response вже JSON
 
     if (!response) {
       console.error(
@@ -62,12 +66,15 @@ export default function AdminDocuments() {
       return;
     }
 
-    console.log("✅ Документ успішно оновлено!");
+    console.log("✅ handleUpdate->Документ успішно оновлено!");
     fetchDocuments();
   };
 
   const handleAddDocument = async () => {
-    console.log("📤 Відправка нового документа:", newDocument);
+    console.log(
+      "📤 handleAddDocument->Відправка нового документа:",
+      newDocument,
+    );
 
     const response = await fetchWithAuth("/api/documents", {
       method: "POST",
@@ -75,17 +82,19 @@ export default function AdminDocuments() {
       body: JSON.stringify(newDocument),
     });
 
-    const data = await response.json(); // ✅ Парсимо JSON тут
-
-    if (!response.ok) {
-      console.error(
-        "❌ Помилка при додаванні документа:",
-        data.error || "Невідома помилка",
-      );
+    if (!response) {
+      console.error("❌ Відповідь не отримана!");
       return;
     }
 
-    console.log("✅ Документ успішно додано:", data);
+    console.log("📩 Отримана відповідь:", response);
+
+    if (response.error) {
+      console.error("❌ Помилка при додаванні документа:", response.error);
+      return;
+    }
+
+    console.log("✅ Документ успішно додано:", response.message);
     fetchDocuments();
     setIsAdding(false);
     setNewDocument({
@@ -115,7 +124,9 @@ export default function AdminDocuments() {
       </h1>
 
       <button
-        onClick={() => setIsAdding(true)}
+        onClick={() => {
+          setIsAdding(true);
+        }}
         className="mb-4 bg-blue-500 text-white px-4 py-2 rounded"
       >
         Додати документ
@@ -162,9 +173,9 @@ export default function AdminDocuments() {
           />
           <UploadDocument
             onUpload={(filePath) => {
-              console.log("📌 Отриманий filePath:", filePath);
+              // console.log("📌 Отриманий filePath:", filePath);
               setNewDocument((prev) => {
-                console.log("📌 Оновлений newDocument:", { ...prev, filePath }); // ЛОГ ДЛЯ ПЕРЕВІРКИ
+                // console.log("📌 Оновлений newDocument:", { ...prev, filePath }); // ЛОГ ДЛЯ ПЕРЕВІРКИ
                 return { ...prev, filePath };
               });
             }}
