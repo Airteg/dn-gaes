@@ -1,12 +1,14 @@
 "use client";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
+import { AuthContext } from "@/app/providers/AuthProvider"; // Імпортуємо контекст
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { login } = useContext(AuthContext); // Отримуємо login з контексту
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,7 +21,7 @@ export default function LoginPage() {
     });
 
     const data = await res.json();
-
+    login(data.token);
     if (res.ok) {
       localStorage.setItem("token", data.token);
       window.dispatchEvent(new Event("storage"));

@@ -2,6 +2,7 @@ import connectToDatabase from "@/utils/db";
 import "../styles/globals.css";
 import Menu from "../components/Menu.jsx";
 import ReactQueryProvider from "./providers/ReactQueryProvider.jsx";
+import { AuthProvider } from "./providers/AuthProvider.jsx";
 
 export const metadata = {
   title: "Нижньодністровська ГЕС",
@@ -13,12 +14,14 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <ReactQueryProvider>
-          <div>
-            <Menu />
-            <main className="container mx-auto p-4">{children}</main>
-          </div>
-        </ReactQueryProvider>
+        <AuthProvider>
+          <ReactQueryProvider>
+            <div>
+              <Menu />
+              <main className="container mx-auto p-4">{children}</main>
+            </div>
+          </ReactQueryProvider>
+        </AuthProvider>
       </body>
     </html>
   );

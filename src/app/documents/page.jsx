@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { fetchWithAuth } from "@/utils/fetchWithAuth";
+import fetchWithAuth from "@/utils/fetchWithAuth";
 
 export default function DocumentsPage() {
   const [documents, setDocuments] = useState([]);

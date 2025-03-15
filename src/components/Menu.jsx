@@ -1,21 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { AuthContext } from "@/app/providers/AuthProvider";
 
 const Menu = () => {
+  const { token, user, logout } = useContext(AuthContext);
+  console.log("🚀 MENU ~ user:", user);
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const [isDesktop, setIsDesktop] = useState(false);
-
   const pathname = usePathname();
+  const [forceUpdate, setForceUpdate] = useState(0);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.reload();
-  };
+  useEffect(() => {
+    setForceUpdate((prev) => prev + 1); // Примусовий ререндер після логіну
+  }, [user]);
 
   useEffect(() => {
     setIsOpen(false); // Закриваємо меню при зміні маршруту
@@ -36,35 +37,6 @@ const Menu = () => {
         ? "bg-gray-700 text-yellow-300"
         : "hover:bg-gray-700 md:hover:bg-transparent"
     }`;
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const fetchUser = () => {
-      const token = localStorage.getItem("token");
-      // console.log("📌 Отриманий токен у Menu:", token);
-
-      if (!token) {
-        setUser(null);
-        return;
-      }
-
-      fetch("/api/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          // console.log("📌 Дані користувача у Menu:", data);
-          if (!data.error) setUser(data);
-        })
-        .catch((err) => console.error("❌ Помилка запиту у Menu:", err));
-    };
-
-    fetchUser();
-    window.addEventListener("storage", fetchUser); // Відслідковуємо зміни
-
-    return () => window.removeEventListener("storage", fetchUser); // Очищення
-  }, []);
 
   return (
     <nav className="bg-gray-800 text-white p-4">
@@ -109,12 +81,11 @@ const Menu = () => {
             )}
         </div>
         <div>
-          {/* {user ? `${user.firstName} ${user.lastName} (${user.role})` : "Гість"} */}
           {user ? (
             <div>
               {user.firstName} {user.lastName} ({user.role})
               <button
-                onClick={handleLogout}
+                onClick={logout}
                 className="ml-4 bg-red-500 hover:bg-red-600 px-2 py-1 rounded"
               >
                 Вийти

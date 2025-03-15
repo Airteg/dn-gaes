@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import UploadDocument from "@/components/admin/UploadDocument";
-import { fetchWithAuth } from "@/utils/fetchWithAuth";
+import fetchWithAuth from "@/utils/fetchWithAuth";
 
 export default function AdminDocuments() {
   const [documents, setDocuments] = useState([]);
