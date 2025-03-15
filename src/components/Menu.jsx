@@ -8,7 +8,6 @@ import { AuthContext } from "@/app/providers/AuthProvider";
 
 const Menu = () => {
   const { token, user, logout } = useContext(AuthContext);
-  console.log("🚀 MENU ~ user:", user);
   const [isOpen, setIsOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const pathname = usePathname();

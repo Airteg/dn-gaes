@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "@/app/providers/AuthProvider";
 import UploadDocument from "@/components/admin/UploadDocument";
 import fetchWithAuth from "@/utils/fetchWithAuth";
 
 export default function AdminDocuments() {
+  const { token } = useContext(AuthContext);
   const [documents, setDocuments] = useState([]);
   const [sortField, setSortField] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
@@ -65,7 +67,7 @@ export default function AdminDocuments() {
 
   const handleAddDocument = async () => {
     console.log("📤 Відправка нового документа:", newDocument);
-    const response = await fetch("/api/documents", {
+    const response = await fetchWithAuth("/api/documents", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newDocument),

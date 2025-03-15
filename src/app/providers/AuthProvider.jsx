@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (newToken) => {
-    console.log("📌 [AuthProvider] Викликано login(), токен:", newToken);
+    // console.log("📌 [AuthProvider] Викликано login(), токен:", newToken);
     localStorage.setItem("token", newToken);
     setToken(newToken);
 
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${newToken}` },
       });
       const data = await res.json();
-      console.log("📌 [AuthProvider] Дані користувача після входу:", data);
+      // console.log("📌 [AuthProvider] Дані користувача після входу:", data);
 
       if (!data.error) {
         setUser(data);
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  console.log("🚀 AuthContext ~ user:", user);
+  // console.log("🚀 AuthContext ~ user:", user);
 
   return (
     <AuthContext.Provider value={{ token, user, login, logout }}>
