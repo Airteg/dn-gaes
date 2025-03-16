@@ -1,16 +1,13 @@
 "use client";
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "@/app/providers/AuthProvider";
-import UploadDocument from "@/components/admin/UploadDocument";
 import fetchWithAuth from "@/utils/fetchWithAuth";
+import DocumentsTable from "@/components/admin/DocumentsTable";
+import AddDocumentForm from "@/components/admin/AddDocumentForm";
 
 export default function AdminDocuments() {
   const { user } = useContext(AuthContext);
   const [documents, setDocuments] = useState([]);
-  const [sortField, setSortField] = useState(null);
-  const [sortOrder, setSortOrder] = useState("asc");
-  const [filters, setFilters] = useState({ category: "", isArchived: null });
-  const [searchQuery, setSearchQuery] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [newDocument, setNewDocument] = useState({
     title: "",
@@ -20,6 +17,7 @@ export default function AdminDocuments() {
     isArchived: false,
     onlyForShareholders: false,
   });
+
   const fetchDocuments = async () => {
     const data = await fetchWithAuth("/api/documents");
     if (data) setDocuments(data);
@@ -30,55 +28,27 @@ export default function AdminDocuments() {
   }, [user]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchDocuments();
-    };
+    const fetchData = async () => await fetchDocuments();
     fetchData();
   }, []);
 
-  const handleSort = (field) => {
-    const newOrder =
-      sortField === field && sortOrder === "asc" ? "desc" : "asc";
-    setSortField(field);
-    setSortOrder(newOrder);
-
-    const sortedDocs = [...documents].sort((a, b) => {
-      if (a[field] < b[field]) return newOrder === "asc" ? -1 : 1;
-      if (a[field] > b[field]) return newOrder === "asc" ? 1 : -1;
-      return 0;
-    });
-    setDocuments(sortedDocs);
-  };
-
   const handleUpdate = async (id, field, value) => {
-    console.log(
-      `🔄 handleUpdate->Оновлення документа ${id}: ${field} ->`,
-      value,
-    );
-
+    console.log(`🔄 Оновлення документа ${id}: ${field} ->`, value);
     const response = await fetchWithAuth(`/api/documents/${id}`, {
       method: "PATCH",
       body: JSON.stringify({ [field]: value }),
     });
 
-    console.log("📌 handleUpdate->response:", response); // Переконуємось, що response вже JSON
-
-    if (!response) {
-      console.error(
-        "❌ Помилка оновлення документа: Немає відповіді від сервера",
-      );
-      return;
+    if (response) {
+      console.log("✅ Документ успішно оновлено!");
+      fetchDocuments();
+    } else {
+      console.error("❌ Помилка оновлення документа!");
     }
-
-    console.log("✅ handleUpdate->Документ успішно оновлено!");
-    fetchDocuments();
   };
 
   const handleAddDocument = async () => {
-    console.log(
-      "📤 handleAddDocument->Відправка нового документа:",
-      newDocument,
-    );
+    console.log("📤 Відправка нового документа:", newDocument);
 
     const response = await fetchWithAuth("/api/documents", {
       method: "POST",
@@ -86,19 +56,12 @@ export default function AdminDocuments() {
       body: JSON.stringify(newDocument),
     });
 
-    if (!response) {
-      console.error("❌ Відповідь не отримана!");
+    if (response?.error) {
+      console.error("❌ Помилка при додаванні:", response.error);
       return;
     }
 
-    console.log("📩 Отримана відповідь:", response);
-
-    if (response.error) {
-      console.error("❌ Помилка при додаванні документа:", response.error);
-      return;
-    }
-
-    console.log("✅ Документ успішно додано:", response.message);
+    console.log("✅ Документ додано:", response.message);
     fetchDocuments();
     setIsAdding(false);
     setNewDocument({
@@ -111,16 +74,6 @@ export default function AdminDocuments() {
     });
   };
 
-  const filteredDocs = documents.filter(
-    (doc) =>
-      (!filters.category || doc.category === filters.category) &&
-      (filters.isArchived === null || doc.isArchived === filters.isArchived) &&
-      ((doc.title &&
-        doc.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (doc.description &&
-          doc.description.toLowerCase().includes(searchQuery.toLowerCase()))),
-  );
-
   return (
     <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold text-center mb-6">
@@ -128,151 +81,22 @@ export default function AdminDocuments() {
       </h1>
 
       <button
-        onClick={() => {
-          setIsAdding(true);
-        }}
+        onClick={() => setIsAdding(true)}
         className="mb-4 bg-blue-500 text-white px-4 py-2 rounded"
       >
         Додати документ
       </button>
 
       {isAdding && (
-        <div className="p-4 border border-gray-300 mb-4">
-          <h2 className="text-lg font-bold mb-2">Новий документ</h2>
-          <input
-            type="text"
-            placeholder="Назва"
-            value={newDocument.title}
-            onChange={(e) =>
-              setNewDocument({ ...newDocument, title: e.target.value })
-            }
-            className="border p-2 w-full mb-2"
-          />
-          <input
-            type="text"
-            placeholder="Опис"
-            value={newDocument.description}
-            onChange={(e) =>
-              setNewDocument({ ...newDocument, description: e.target.value })
-            }
-            className="border p-2 w-full mb-2"
-          />
-          <input
-            type="text"
-            placeholder="Категорія"
-            value={newDocument.category}
-            onChange={(e) =>
-              setNewDocument({ ...newDocument, category: e.target.value })
-            }
-            className="border p-2 w-full mb-2"
-          />
-          <input
-            type="text"
-            placeholder="Підкатегорія"
-            value={newDocument.subcategory}
-            onChange={(e) =>
-              setNewDocument({ ...newDocument, subcategory: e.target.value })
-            }
-            className="border p-2 w-full mb-2"
-          />
-          <UploadDocument
-            onUpload={(filePath) => {
-              // console.log("📌 Отриманий filePath:", filePath);
-              setNewDocument((prev) => {
-                // console.log("📌 Оновлений newDocument:", { ...prev, filePath }); // ЛОГ ДЛЯ ПЕРЕВІРКИ
-                return { ...prev, filePath };
-              });
-            }}
-          />
-          <button
-            onClick={handleAddDocument}
-            className="bg-green-500 text-white px-4 py-2 rounded mr-2"
-          >
-            Зберегти
-          </button>
-          <button
-            onClick={() => setIsAdding(false)}
-            className="bg-red-500 text-white px-4 py-2 rounded"
-          >
-            Скасувати
-          </button>
-        </div>
+        <AddDocumentForm
+          newDocument={newDocument}
+          setNewDocument={setNewDocument}
+          onSave={handleAddDocument}
+          onCancel={() => setIsAdding(false)}
+        />
       )}
 
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100/30">
-              <th
-                className="p-2 border cursor-pointer"
-                onClick={() => handleSort("title")}
-              >
-                Назва
-              </th>
-              <th
-                className="p-2 border cursor-pointer"
-                onClick={() => handleSort("category")}
-              >
-                Категорія
-              </th>
-              <th className="p-2 border">Опис</th>
-              <th className="p-2 border">Архів</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredDocs.map((doc) => (
-              <tr key={doc._id} className="border">
-                <EditableCell doc={doc} field="title" onUpdate={handleUpdate} />
-                <EditableCell
-                  doc={doc}
-                  field="category"
-                  onUpdate={handleUpdate}
-                />
-                <EditableCell
-                  doc={doc}
-                  field="description"
-                  onUpdate={handleUpdate}
-                />
-                <ToggleCell
-                  doc={doc}
-                  field="isArchived"
-                  onUpdate={handleUpdate}
-                />
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DocumentsTable documents={documents} onUpdate={handleUpdate} />
     </div>
   );
 }
-const EditableCell = ({ doc, field, onUpdate }) => {
-  const [value, setValue] = useState(doc[field]);
-  useEffect(() => {
-    setValue(doc[field]);
-  }, [doc, field]);
-
-  return (
-    <td className="p-2 border">
-      <input
-        className="w-full p-1 border border-gray-300 rounded"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onBlur={() => onUpdate(doc._id, field, value)}
-      />
-    </td>
-  );
-};
-
-const ToggleCell = ({ doc, field, onUpdate }) => (
-  <td className="p-2 border text-center">
-    <button
-      className={`px-2 py-1 rounded ${
-        doc[field] ? "bg-green-500 text-white" : "bg-gray-300"
-      }`}
-      onClick={() => onUpdate && onUpdate(doc._id, field, !doc[field])}
-    >
-      {doc[field] ? "✓" : "✗"}
-    </button>
-  </td>
-);
