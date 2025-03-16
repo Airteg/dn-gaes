@@ -94,7 +94,7 @@ export default function DocumentsPage() {
         {filteredDocuments.map((doc) => (
           <div key={doc._id} className="p-4 bg-white/10 shadow-md rounded-md">
             <h2 className="text-lg font-semibold">{doc.title}</h2>
-            <p className="text-gray-600 text-sm mb-2">{doc.description}</p>
+            <p className="text-gray-300 text-sm mb-2">{doc.description}</p>
             <a
               href={doc.filePath}
               target="_blank"

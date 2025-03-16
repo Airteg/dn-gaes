@@ -15,7 +15,7 @@ export default function AdminDocuments() {
     category: "",
     subcategory: "",
     isArchived: false,
-    onlyForShareholders: false,
+    shareholdersOnly: false,
   });
 
   const fetchDocuments = async () => {
@@ -70,12 +70,12 @@ export default function AdminDocuments() {
       category: "",
       subcategory: "",
       isArchived: false,
-      onlyForShareholders: false,
+      shareholdersOnly: false,
     });
   };
 
   return (
-    <div className="p-4 max-w-6xl mx-auto">
+    <div className="p-4 max-w-90vw mx-auto">
       <h1 className="text-2xl font-bold text-center mb-6">
         Адміністрування документів
       </h1>
