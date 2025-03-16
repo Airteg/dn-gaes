@@ -20,17 +20,21 @@ export default function AdminDocuments() {
     isArchived: false,
     onlyForShareholders: false,
   });
+  const fetchDocuments = async () => {
+    const data = await fetchWithAuth("/api/documents");
+    if (data) setDocuments(data);
+  };
 
   useEffect(() => {
     setNewDocument((prev) => ({ ...prev, uploadedBy: user?._id }));
   }, [user]);
 
-  useEffect(() => fetchDocuments(), []);
-
-  const fetchDocuments = async () => {
-    const data = await fetchWithAuth("/api/documents");
-    if (data) setDocuments(data);
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchDocuments();
+    };
+    fetchData();
+  }, []);
 
   const handleSort = (field) => {
     const newOrder =
