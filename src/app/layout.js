@@ -1,4 +1,4 @@
-import connectToDatabase from "@/utils/db";
+import clientPromise from "@/utils/db";
 import "../styles/globals.css";
 import Menu from "../components/Menu.jsx";
 import ReactQueryProvider from "./providers/ReactQueryProvider.jsx";
@@ -10,7 +10,7 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  await connectToDatabase();
+  await clientPromise;
   return (
     <html lang="en">
       <body>

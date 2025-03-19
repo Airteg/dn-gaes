@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { SignJWT } from "jose"; // 🔹 Використовуємо jose для генерації JWT
 import connectToDatabase from "@/utils/db";
 import User from "@/models/User";
+
+const secret = new TextEncoder().encode(process.env.JWT_SECRET); // 🔹 Готуємо секретний ключ
 
 export async function POST(req) {
   try {
@@ -35,12 +37,15 @@ export async function POST(req) {
       );
     }
 
-    // Генеруємо JWT токен
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }, // Термін дії токена 7 днів
-    );
+    // Генеруємо JWT токен за допомогою `jose`
+    const token = await new SignJWT({
+      id: user._id.toString(),
+      role: user.role,
+    })
+      .setProtectedHeader({ alg: "HS256" })
+      .setIssuedAt()
+      .setExpirationTime("7d")
+      .sign(secret);
 
     return NextResponse.json(
       { token, message: "Вхід успішний" },

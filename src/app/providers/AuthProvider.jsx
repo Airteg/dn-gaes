@@ -1,68 +1,47 @@
 "use client";
 import { createContext, useEffect, useState } from "react";
+import { useSession, signIn, signOut, SessionProvider } from "next-auth/react";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(null);
+  return (
+    <SessionProvider>
+      <AuthContextProvider>{children}</AuthContextProvider>
+    </SessionProvider>
+  );
+};
+
+const AuthContextProvider = ({ children }) => {
+  const { data: session, status } = useSession();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    setToken(storedToken);
-
-    if (storedToken) {
-      fetch("/api/auth/me", {
-        headers: { Authorization: `Bearer ${storedToken}` },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (!data.error) setUser(data);
-        })
-        .catch((err) =>
-          console.error(
-            "❌ [AuthProvider] Помилка отримання користувача:",
-            err,
-          ),
-        );
+    if (session) {
+      setUser(session.user);
+    } else {
+      setUser(null);
     }
-  }, []);
+  }, [session]);
 
-  const login = async (newToken) => {
-    // console.log("📌 [AuthProvider] Викликано login(), токен:", newToken);
-    localStorage.setItem("token", newToken);
-    setToken(newToken);
-
-    try {
-      const res = await fetch("/api/auth/me", {
-        headers: { Authorization: `Bearer ${newToken}` },
+  const login = async (method, credentials = null) => {
+    if (method === "google") {
+      await signIn("google");
+    } else if (method === "credentials" && credentials) {
+      await signIn("credentials", {
+        email: credentials.email,
+        password: credentials.password,
+        redirect: false,
       });
-      const data = await res.json();
-      // console.log("📌 [AuthProvider] Дані користувача після входу:", data);
-
-      if (!data.error) {
-        setUser(data);
-      } else {
-        console.error(
-          "❌ [AuthProvider] Помилка отримання користувача:",
-          data.error,
-        );
-      }
-    } catch (error) {
-      console.error("❌ [AuthProvider] Помилка запиту:", error);
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setToken(null);
-    setUser(null);
+  const logout = async () => {
+    await signOut();
   };
-
-  // console.log("🚀 AuthContext ~ user:", user);
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, status }}>
       {children}
     </AuthContext.Provider>
   );

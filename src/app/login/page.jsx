@@ -1,34 +1,38 @@
 "use client";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AuthContext } from "@/app/providers/AuthProvider"; // Імпортуємо контекст
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { login } = useContext(AuthContext); // Отримуємо login з контексту
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+    const res = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
     });
 
-    const data = await res.json();
-    login(data.token);
-    if (res.ok) {
-      localStorage.setItem("token", data.token);
-      window.dispatchEvent(new Event("storage"));
+    if (!res?.error) {
       router.push("/");
     } else {
-      setError(data.error || "Невідома помилка");
+      setError(res.error || "Невідома помилка");
     }
+
+    setLoading(false);
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    await signIn("google");
   };
 
   return (
@@ -57,10 +61,22 @@ export default function LoginPage() {
         />
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+          disabled={loading}
+          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
         >
-          Увійти
+          {loading ? "Вхід..." : "Увійти"}
         </button>
+
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600"
+          >
+            Увійти через Google
+          </button>
+        </div>
+
         <div className="mt-4 text-center">
           <a
             href="/reset-password/request"

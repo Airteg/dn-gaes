@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose"; // 🔹 Використовуємо jose для перевірки токена
+
+const secret = new TextEncoder().encode(process.env.JWT_SECRET); // 🔹 Готуємо секретний ключ
 
 export function authMiddleware(handler, requiredRole = null) {
   return async (req) => {
@@ -17,16 +19,18 @@ export function authMiddleware(handler, requiredRole = null) {
     const token = authHeader.split(" ")[1];
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log("✅ Токен дійсний, користувач:", decoded);
-      req.user = decoded;
+      // 🔹 Перевіряємо токен через `jose`
+      const { payload } = await jwtVerify(token, secret);
+      console.log("✅ Токен дійсний, користувач:", payload);
+
+      req.user = payload; // 🔹 Тепер req містить `user`
 
       if (requiredRole) {
         const roles = Array.isArray(requiredRole)
           ? requiredRole
           : [requiredRole];
-        if (!roles.includes(decoded.role)) {
-          console.error("❌ Недостатньо прав:", decoded.role);
+        if (!roles.includes(payload.role)) {
+          console.error("❌ Недостатньо прав:", payload.role);
           return NextResponse.json(
             { error: "Недостатньо прав" },
             { status: 403 },

@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { SignJWT } from "jose"; // 🔹 Використовуємо jose для генерації токена
 import connectToDatabase from "@/utils/db";
 import User from "@/models/User";
+
+const secret = new TextEncoder().encode(process.env.JWT_SECRET); // 🔹 Готуємо секретний ключ
 
 export async function POST(req) {
   await connectToDatabase();
@@ -15,10 +17,12 @@ export async function POST(req) {
     );
   }
 
-  // Генеруємо токен для відновлення пароля (дійсний 1 годину)
-  const resetToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
+  // 🔹 Генеруємо токен для відновлення пароля (дійсний 1 годину)
+  const resetToken = await new SignJWT({ id: user._id.toString() })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("1h")
+    .sign(secret);
 
   // Зберігаємо токен у базі
   user.resetPasswordToken = resetToken;

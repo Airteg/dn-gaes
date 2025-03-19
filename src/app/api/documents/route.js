@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose"; // 🔹 Використовуємо `jose`
+import clientPromise from "@/utils/db";
 
-import { authMiddleware } from "@/middleware/authMiddleware";
-import connectToDatabase from "@/utils/db";
-import Document from "@/models/Document";
+const secret = new TextEncoder().encode(process.env.JWT_SECRET); // 🔹 Ключ для верифікації
 
 // 📌 Отримати всі документи (авторизовані бачать всі, гості – тільки `shareholdersOnly: false`)
 export const GET = async (req) => {
-  await connectToDatabase();
+  const client = await clientPromise;
+  const db = client.db();
 
   // Перевіряємо, чи є токен
   const authHeader = req.headers.get("authorization");
@@ -16,13 +16,17 @@ export const GET = async (req) => {
   if (authHeader && authHeader.startsWith("Bearer ")) {
     try {
       const token = authHeader.split(" ")[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      user = decoded;
+
+      // 🔹 Замість `jwt.verify()`, використовуємо `await jwtVerify()`
+      const { payload } = await jwtVerify(token, secret);
+      user = payload;
+
       console.log("✅ Авторизований користувач:", user);
     } catch (error) {
       console.error("❌ Невірний токен:", error);
     }
   }
+
   console.log("📌 Отримано запит до /api/documents");
   console.log("📌 Авторизація:", authHeader || "Гість");
 
@@ -30,53 +34,6 @@ export const GET = async (req) => {
   const filter = user ? {} : { shareholdersOnly: false };
   console.log("🚀 ~ filter:", filter);
 
-  const documents = await Document.find(filter);
+  const documents = await db.collection("documents").find(filter).toArray();
   return NextResponse.json(documents);
 };
-
-// 📌 Додати новий документ (тільки для модераторів та адміністраторів)
-export const POST = authMiddleware(
-  async (req) => {
-    await connectToDatabase();
-    const body = await req.json();
-
-    const newDocument = new Document({
-      title: body.title,
-      description: body.description,
-      category: body.category,
-      subcategory: body.subcategory || "",
-      filePath: body.filePath,
-      uploadedBy: body.uploadedBy,
-      isArchived: false,
-      isDeleted: false,
-      shareholdersOnly: body.shareholdersOnly || false,
-    });
-
-    await newDocument.save();
-    return NextResponse.json({ message: "Документ додано" }, { status: 201 });
-  },
-  ["moderator", "admin"],
-);
-
-// 📌 Видалити документ (помітити як `isDeleted: true`, тільки адміністратор)
-export const DELETE = authMiddleware(
-  async (req) => {
-    await connectToDatabase();
-    const { id } = await req.json();
-
-    const document = await Document.findById(id);
-    if (!document)
-      return NextResponse.json(
-        { error: "Документ не знайдено" },
-        { status: 404 },
-      );
-
-    document.isDeleted = true;
-    await document.save();
-
-    return NextResponse.json({
-      message: "Документ видалено (isDeleted: true)",
-    });
-  },
-  ["moderator", "admin"],
-);

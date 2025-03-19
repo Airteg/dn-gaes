@@ -1,16 +1,19 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose"; // 🔹 Використовуємо `jose` для перевірки токена
 import bcrypt from "bcryptjs";
 import connectToDatabase from "@/utils/db";
 import User from "@/models/User";
+
+const secret = new TextEncoder().encode(process.env.JWT_SECRET); // 🔹 Ключ для верифікації
 
 export async function POST(req) {
   await connectToDatabase();
   const { token, newPassword } = await req.json();
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
+    // 🔹 Перевіряємо токен через `jose`
+    const { payload } = await jwtVerify(token, secret);
+    const user = await User.findById(payload.id);
 
     if (
       !user ||

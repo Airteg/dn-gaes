@@ -15,11 +15,13 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setLoading(true);
 
     const res = await fetch("/api/auth/register", {
       method: "POST",
@@ -31,10 +33,12 @@ export default function RegisterPage() {
 
     if (res.ok) {
       setSuccess("Реєстрація успішна! Очікуйте підтвердження адміністратора.");
-      setTimeout(() => router.push("/login"), 2000);
+      setTimeout(() => router.push("/login"), 3000);
     } else {
       setError(data.error || "Помилка реєстрації.");
     }
+
+    setLoading(false);
   };
 
   const handleChange = (e) => {
@@ -50,6 +54,7 @@ export default function RegisterPage() {
         <h2 className="text-xl font-bold mb-4">Реєстрація</h2>
         {error && <p className="text-red-500">{error}</p>}
         {success && <p className="text-green-500">{success}</p>}
+
         <input
           type="text"
           name="firstName"
@@ -104,12 +109,15 @@ export default function RegisterPage() {
           className="w-full p-2 border rounded mb-2"
           onChange={handleChange}
         />
+
         <button
           type="submit"
-          className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600"
+          disabled={loading}
+          className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 disabled:bg-gray-400"
         >
-          Зареєструватися
+          {loading ? "Реєстрація..." : "Зареєструватися"}
         </button>
+
         <div className="mt-4 text-center">
           <a href="/login" className="text-blue-500 hover:underline">
             Вже маєте акаунт? Увійти
