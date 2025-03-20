@@ -31,6 +31,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = async () => {
+    console.log("📌 Вхід через Google ініційовано...");
     setLoading(true);
     await signIn("google");
   };
