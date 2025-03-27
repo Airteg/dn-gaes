@@ -1,97 +1,74 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
 
     const res = await signIn("credentials", {
+      redirect: false,
       email,
       password,
-      redirect: false,
     });
 
-    if (!res?.error) {
-      router.push("/");
-    } else {
-      setError(res.error || "Невідома помилка");
-    }
-
-    setLoading(false);
+    if (res.ok) router.push("/profile");
+    else alert("Невірний логін або пароль");
   };
 
-  const handleGoogleLogin = async () => {
-    console.log("📌 Вхід через Google ініційовано...");
-    setLoading(true);
-    await signIn("google");
+  const handleGoogleLogin = () => {
+    signIn("google");
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <form
-        onSubmit={handleLogin}
-        className="p-6 bg-white/20 shadow-md rounded-lg w-80"
-      >
-        <h2 className="text-xl font-bold mb-4">Вхід</h2>
-        {error && <p className="text-red-500">{error}</p>}
+    <div className="max-w-sm mx-auto mt-10 space-y-4">
+      <form onSubmit={handleLogin} className="space-y-4">
         <input
           type="email"
-          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
           required
-          className="w-full p-2 border rounded mb-2"
         />
         <input
           type="password"
-          placeholder="Пароль"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
           required
-          className="w-full p-2 border rounded mb-2"
         />
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
-        >
-          {loading ? "Вхід..." : "Увійти"}
-        </button>
+        <button type="submit">Login</button>
+      </form>
 
-        <div className="mt-4 text-center">
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            className="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600"
-          >
-            Увійти через Google
-          </button>
-        </div>
+      <button
+        onClick={handleGoogleLogin}
+        className="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600"
+      >
+        Sign in with Google
+      </button>
 
-        <div className="mt-4 text-center">
+      <div className="text-center text-sm text-gray-600 space-y-1">
+        <p>
+          Немає акаунта?{" "}
+          <a href="/register" className="text-blue-500 hover:underline">
+            Зареєструватися
+          </a>
+        </p>
+        <p>
           <a
             href="/reset-password/request"
             className="text-blue-500 hover:underline"
           >
             Забули пароль?
           </a>
-        </div>
-        <div className="mt-2 text-center">
-          <a href="/register" className="text-blue-500 hover:underline">
-            Новий користувач? Зареєструватися
-          </a>
-        </div>
-      </form>
+        </p>
+      </div>
     </div>
   );
 }
