@@ -26,9 +26,6 @@ importers:
       bcryptjs:
         specifier: ^3.0.2
         version: 3.0.2
-      jose:
-        specifier: ^6.0.10
-        version: 6.0.10
       lucide-react:
         specifier: ^0.474.0
         version: 0.474.0(react@19.0.0)
