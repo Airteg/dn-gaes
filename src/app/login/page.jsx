@@ -1,6 +1,7 @@
 "use client";
 
 import { login } from "@/utils/authActions/auth.js";
+import { useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
   return (
