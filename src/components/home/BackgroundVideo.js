@@ -8,7 +8,7 @@ const BackgroundVideo = () => {
         Ваш браузер не підтримує відео.
       </video>
       <div className="overlay">
-        <h1 className="title">"Нижньодністровська ГЕС</h1>
+        <h1 className="title">Нижньодністровська ГЕС</h1>
       </div>
     </div>
   );
