@@ -1,5 +1,5 @@
 import Google from "next-auth/providers/google";
-import { db } from "@/utils/db";
+// import User from "@/models/User";
 
 export const authConfig = {
   providers: [
@@ -9,26 +9,29 @@ export const authConfig = {
     }),
   ],
   // callbacks: {
-  //   async jwt({ token }) {
-  //     const userInDb = await db
-  //       .collection("users")
-  //       .findOne({ email: token.email });
+  //   async jwt({ token, account, profile }) {
+  //     // 🔹 Викликається тільки після входу (не на кожен запит)
+  //     if (account && profile) {
+  //       const existingUser = await User.findOne({ email: token.email });
 
-  //     if (!userInDb) {
-  //       // Додаємо користувача з роллю user
-  //       await db.collection("users").insertOne({
-  //         email: token.email,
-  //         name: token.name,
-  //         role: "user",
-  //         createdAt: new Date(),
-  //       });
-  //       token.role = "user";
-  //     } else {
-  //       token.role = userInDb.role;
+  //       if (!existingUser) {
+  //         const newUser = await User.create({
+  //           name: profile.name,
+  //           email: profile.email,
+  //           image: profile.picture,
+  //           role: "user", // за замовчуванням
+  //           createdAt: new Date(),
+  //         });
+
+  //         token.role = newUser.role;
+  //       } else {
+  //         token.role = existingUser.role;
+  //       }
   //     }
 
   //     return token;
   //   },
+
   //   async session({ session, token }) {
   //     session.user.role = token.role;
   //     return session;

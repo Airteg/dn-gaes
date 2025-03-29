@@ -1,23 +1,17 @@
-import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server.js";
+import { auth } from "@/auth";
 
-export default withAuth({
-  callbacks: {
-    async authorized({ req, token }) {
-      const pathname = req.nextUrl.pathname;
+const protectedRoutes = ["/admin", "/dashboard"];
 
-      // 🔹 Якщо токена немає, доступ заборонено
-      if (!token) return false;
-
-      // 🔹 Блокуємо доступ до адмін-панелі для гостей і "pending" користувачів
-      if (pathname.startsWith("/admin") && token.status !== "active") {
-        return false;
-      }
-
-      return true; // ✅ Доступ дозволено
-    },
-  },
-});
-
-export const config = {
-  matcher: ["/admin/:path*", "/dashboard/:path*"], // 🔹 Захищені маршрути
-};
+export default async function middleware(req) {
+  const session = await auth();
+  const { pathname } = req.nextUrl;
+  const user = session?.user;
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
+  if (isProtectedRoute && !user) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+  return NextResponse.next();
+}

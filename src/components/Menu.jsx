@@ -38,11 +38,11 @@ export default async function Menu() {
           >
             Контакти
           </Link>
-          {user && (user.role === "admin" || user.role === "moderator") && (
-            <Link href="/admin" className={linkClasses("/admin", "/admin")}>
-              Адміністрування
-            </Link>
-          )}
+          {/* {user && (user.role === "admin" || user.role === "moderator") && ( */}
+          <Link href="/admin" className={linkClasses("/admin", "/admin")}>
+            Адміністрування
+          </Link>
+          {/* // )} */}
         </div>
         <div>
           {user ? (
@@ -53,6 +53,9 @@ export default async function Menu() {
                   width={40}
                   height={40}
                   alt={user.name ?? "Avatar"}
+                  style={{
+                    borderRadius: "50%",
+                  }}
                 />
               )}
               {user.name} ({user.role})
