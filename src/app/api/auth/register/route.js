@@ -16,7 +16,7 @@ export async function POST(req) {
       placeOfWork,
     } = await req.json();
 
-    // Перевірка, чи існує користувач із таким email або nickname
+    // 🔹 Перевірка, чи існує користувач
     const existingUser = await User.findOne({ $or: [{ email }, { nickname }] });
     if (existingUser) {
       return NextResponse.json(
@@ -25,10 +25,10 @@ export async function POST(req) {
       );
     }
 
-    // Хешування пароля
+    // 🔹 Хешування пароля
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Створення нового користувача зі статусом "pending"
+    // 🔹 Створення нового користувача зі статусом "pending"
     const newUser = await User.create({
       email,
       password: hashedPassword,
@@ -43,8 +43,7 @@ export async function POST(req) {
 
     return NextResponse.json(
       {
-        message:
-          "Користувача зареєстровано. Очікуйте підтвердження адміністратора.",
+        message: "Реєстрація успішна! Очікуйте підтвердження адміністратора.",
       },
       { status: 201 },
     );

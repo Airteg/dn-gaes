@@ -1,12 +1,10 @@
 "use client";
-import { useState, useEffect, useContext } from "react";
-import { AuthContext } from "@/app/providers/AuthProvider";
+import { useState, useEffect } from "react";
 import fetchWithAuth from "@/utils/fetchWithAuth";
 import DocumentsTable from "@/components/admin/DocumentsTable";
 import AddDocumentForm from "@/components/admin/AddDocumentForm";
 
 export default function AdminDocuments() {
-  const { user } = useContext(AuthContext);
   const [documents, setDocuments] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
   const [newDocument, setNewDocument] = useState({
@@ -23,9 +21,9 @@ export default function AdminDocuments() {
     if (data) setDocuments(data);
   };
 
-  useEffect(() => {
-    setNewDocument((prev) => ({ ...prev, uploadedBy: user?._id }));
-  }, [user]);
+  // useEffect(() => {
+  //   setNewDocument((prev) => ({ ...prev, uploadedBy: user?._id }));
+  // }, [user]);
 
   useEffect(() => {
     const fetchData = async () => await fetchDocuments();
