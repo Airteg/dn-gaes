@@ -48,5 +48,4 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-delete mongoose.models.User; // 🔹 Видаляємо кешовану модель
 export default mongoose.models.User || mongoose.model("User", UserSchema);
