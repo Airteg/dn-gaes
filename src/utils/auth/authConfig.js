@@ -1,40 +1,22 @@
 import Google from "next-auth/providers/google";
-// import User from "@/models/User";
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import clientPromise from "@/utils/db";
 
 export const authConfig = {
+  adapter: MongoDBAdapter(clientPromise),
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
-  // callbacks: {
-  //   async jwt({ token, account, profile }) {
-  //     // 🔹 Викликається тільки після входу (не на кожен запит)
-  //     if (account && profile) {
-  //       const existingUser = await User.findOne({ email: token.email });
-
-  //       if (!existingUser) {
-  //         const newUser = await User.create({
-  //           name: profile.name,
-  //           email: profile.email,
-  //           image: profile.picture,
-  //           role: "user", // за замовчуванням
-  //           createdAt: new Date(),
-  //         });
-
-  //         token.role = newUser.role;
-  //       } else {
-  //         token.role = existingUser.role;
-  //       }
-  //     }
-
-  //     return token;
-  //   },
-
-  //   async session({ session, token }) {
-  //     session.user.role = token.role;
-  //     return session;
-  //   },
-  // },
+  session: {
+    strategy: "jwt", // або "database", якщо хочеш сесії в базі
+  },
+  callbacks: {
+    async session({ session, token }) {
+      session.user.id = token.sub;
+      return session;
+    },
+  },
 };
