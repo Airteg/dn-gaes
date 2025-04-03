@@ -18,15 +18,14 @@ export default function RootLayout({ children }) {
   return (
     <html lang="uk">
       <head>
-        {/* Next.js автоматично додасть title і meta з metadata, але можна вручну для точності */}
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
       <body>
         <AuthProvider>
-          <div>
+          <div className="flex flex-col min-h-screen">
             <Menu />
-            <main className="container mx-auto p-4">{children}</main>
+            <main className="flex flex-1  mx-auto p-0">{children}</main>
           </div>
         </AuthProvider>
       </body>

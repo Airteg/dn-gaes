@@ -15,21 +15,33 @@ export const authConfig = {
   },
   callbacks: {
     async signIn({ user, account }) {
+      console.log("signIn called:", {
+        email: user.email,
+        provider: account.provider,
+        providerAccountId: account.providerAccountId,
+      });
       const client = await clientPromise;
       const db = client.db();
       const users = db.collection("users");
 
-      // Оновлюємо lastLogin для існуючого користувача
       const existingUser = await users.findOne({ email: user.email });
       if (existingUser) {
+        console.log("Existing user found:", { email: existingUser.email });
         await users.updateOne(
           { email: user.email },
           { $set: { lastLogin: new Date() } },
         );
+        return true;
       }
-      return true; // Дозволяємо адаптеру завершити зв’язування
+
+      console.log("User not found, blocking login:", { email: user.email });
+      return "/register?error=UserNotRegistered";
     },
     async session({ session, token }) {
+      console.log("session called:", {
+        email: session.user.email,
+        userId: token.sub,
+      });
       const client = await clientPromise;
       const db = client.db();
       const dbUser = await db
