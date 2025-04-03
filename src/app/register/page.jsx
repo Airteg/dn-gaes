@@ -11,32 +11,9 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const inputClass =
     "w-full mt-4 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500";
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
 
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, name }),
-    });
+  const handleSubmit = () => {};
 
-    const data = await res.json();
-    if (res.ok) {
-      // Автоматично входимо після реєстрації
-      await signIn("credentials", {
-        email,
-        password,
-        redirect: true,
-        callbackUrl: "/dashboard",
-      });
-    } else {
-      setError(data.error);
-    }
-    setLoading(false);
-  };
-  console.log("error", error);
   return (
     <div className="flex-1 flex self-center items-center justify-center bg-gray-100/10 p-4">
       <div className="w-full max-w-md bg-white/10 p-6 rounded shadow-md">
@@ -90,7 +67,7 @@ export default function RegisterPage() {
           </a>
         </div>
         <div className="mt-2 text-sm text-center">
-          Немає акаунту?{" "}
+          Немає акаунту?{" "}
           <a href="/register" className="text-blue-600 hover:underline">
             Зареєструватися
           </a>
