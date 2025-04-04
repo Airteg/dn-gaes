@@ -6,7 +6,7 @@ import ButtonLogout from "./ButtonLogout.jsx";
 export default async function Menu() {
   const session = await auth();
   const user = session?.user;
-  console.log("🚀 ~ user:", session?.user);
+  // console.log("🚀 ~ user:", session?.user);
 
   const linkClasses = (pathname, href) =>
     `block mx-1 py-2 px-4 ${

@@ -57,6 +57,13 @@ export const authConfig = {
   },
 
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        console.log("✅ user:", !!user);
+        token.role = user.role;
+      }
+      return token;
+    },
     async signIn({ user, account }) {
       // ✅ Повністю пропускаємо обробку OAuth-реєстрації/входу
       if (account?.provider !== "credentials") return true;
@@ -80,13 +87,14 @@ export const authConfig = {
       const user = await db
         .collection("users")
         .findOne({ email: session.user.email });
-      console.log("authConfig -> user", user);
+      // console.log("authConfig -> user", user);
       if (user) {
         session.user.id = user._id.toString();
         session.user.name = user.name;
         session.user.role = user.role;
         session.user.status = user.status;
         session.user.methods = user.methods;
+        token.role = user.role;
       }
 
       return session;
