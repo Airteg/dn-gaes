@@ -1,18 +1,52 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 export default function RegisterPage() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const inputClass =
     "w-full mt-4 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500";
 
-  const handleSubmit = () => {};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    if (password !== confirmPassword) {
+      setError("Паролі не співпадають");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, name }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Помилка реєстрації");
+
+      router.push("/login");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex-1 flex self-center items-center justify-center bg-gray-100/10 p-4">
@@ -28,6 +62,14 @@ export default function RegisterPage() {
             className={inputClass}
           />
           <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Ваше ім’я"
+            required
+            className={inputClass}
+          />
+          <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -37,8 +79,8 @@ export default function RegisterPage() {
           />
           <input
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Підтвердження пароля"
             required
             className={inputClass}
@@ -67,9 +109,9 @@ export default function RegisterPage() {
           </a>
         </div>
         <div className="mt-2 text-sm text-center">
-          Немає акаунту?{" "}
-          <a href="/register" className="text-blue-600 hover:underline">
-            Зареєструватися
+          Уже є акаунт?{" "}
+          <a href="/login" className="text-blue-600 hover:underline">
+            Увійти
           </a>
         </div>
       </div>

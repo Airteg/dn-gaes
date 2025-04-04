@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/utils/db";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export async function POST(req) {
   const { email, password, name } = await req.json();
@@ -28,6 +28,7 @@ export async function POST(req) {
     role: "user",
     status: "active",
     authMethod: "credentials",
+    methods: ["credentials"],
     createdAt: new Date(),
   });
 
