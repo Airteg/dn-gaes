@@ -24,17 +24,29 @@ export const authConfig = {
         const db = client.db();
         const users = db.collection("users");
         const user = await users.findOne({ email: credentials.email });
-        console.log("authConfig -> authorize -> user:", user);
+        console.log("authConfig -> authorize -> user:", {
+          email: credentials.email,
+          found: !!user,
+        });
         if (!user) throw new Error("UserNotRegistered");
-        if (!user.methods?.includes("credentials"))
+        if (!user.methods?.includes("credentials")) {
+          console.log("Credentials: No credentials method:", {
+            email: credentials.email,
+          });
           throw new Error("UseDifferentMethod");
+        }
 
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          user.password,
-        );
-        if (!isValid) throw new Error("InvalidPassword");
+        const isValid = bcrypt.compare(credentials.password, user.password);
+        if (!isValid) {
+          console.log("Credentials: Invalid password:", {
+            email: credentials.email,
+          });
+          throw new Error("InvalidPassword");
+        }
 
+        console.log("Credentials: User authenticated:", {
+          email: credentials.email,
+        });
         return { id: user._id.toString(), email: user.email };
       },
     }),

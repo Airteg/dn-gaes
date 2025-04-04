@@ -11,7 +11,24 @@ export default function LoginPage() {
   const inputClass =
     "w-full mt-4 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500";
 
-  const handleSubmit = () => {};
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Запобігаємо перезавантаженню сторінки
+    const result = await signIn("credentials", {
+      email,
+      password,
+      callbackUrl: "/", // Перенаправлення на головну після входу
+      redirect: true,
+      // Щоб побачити результат у консолі, якщо щось не так,
+      // redirect: false,
+    });
+    // ... і розкоментувати код нижче
+    // if (result?.error) {
+    //   console.log("Login failed:", result.error);
+    // } else if (result?.ok) {
+    //   console.log("Login successful:", result);
+    //   window.location.href = result.url; // 🔁 вручну перенаправляємо
+    // }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100/10 px-4">
