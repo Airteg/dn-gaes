@@ -409,4 +409,233 @@ providers: [Google({...}), Credentials({...})]
 
 Middleware для захисту сторінок більше не використовує `auth()`, бо це несумісно з Edge Runtime. Замість цього — `getToken()` з `next-auth/jwt`.
 
+---
 
+### Аналіз коду `MongoDBAdapter`
+Код із `index.ts` показує, як адаптер реалізує методи `Adapter` із `@auth/core/adapters`. 
+Нижче ключові моменти, які стосуються створення користувача й додавання кастомних даних.
+
+#### Метод `createUser`
+```typescript
+async createUser(data) {
+  const user = to<AdapterUser>(data);
+  await using db = await getDb();
+  await db.U.insertOne(user);
+  return from<AdapterUser>(user);
+}
+```
+- **Що робить**:
+  - Бере об’єкт `data` (типу `AdapterUser`), який приходить від `Auth.js`.
+  - Перетворює його в MongoDB-формат через `to` (додає `_id`).
+  - Вставляє в колекцію `users`.
+  - Повертає результат у форматі `AdapterUser`.
+- **Що в `data`**:
+  - Для Google: `email`, `name`, `image` (з профілю Google), але **не** кастомні поля типу `role` чи `comments`.
+- **Проблема**: Ми не контролюємо `data`, яке передає `Auth.js` у `createUser`. Воно формується з OAuth-відповіді, і ми не можемо додати туди `role` напряму.
+
+#### Метод `getUserByEmail`
+```typescript
+async getUserByEmail(email) {
+  await using db = await getDb();
+  const user = await db.U.findOne({ email });
+  if (!user) return null;
+  return from<AdapterUser>(user);
+}
+```
+- **Що робить**: Шукає користувача за `email` і повертає його.
+- **Можливість**: Ми можемо використати це в `signIn`, щоб оновити запис.
+
+#### Коментарі в коді
+Коментар про `client` і `onClose` натякає на гнучкість підключення, але не стосується кастомізації схеми. Адаптер явно розроблений як "універсальний", без вбудованої підтримки кастомних полів.
+
+---
+
+### Чому ми не можемо додати `role` напряму?
+1. **Фіксована схема**:
+   - `MongoDBAdapter` працює з типом `AdapterUser`:
+     ```typescript
+     interface AdapterUser {
+       id: string;
+       email: string;
+       emailVerified: Date | null;
+       name?: string | null;
+       image?: string | null;
+     }
+     ```
+   - Немає `role`, `comments` чи інших кастомних полів.
+2. **OAuth-провайдер**:
+   - Google передає тільки базові дані (`email`, `name`, `image`), і `Auth.js` викликає `createUser` із цими даними.
+3. **Конфлікт при ручному `upsert`**:
+   - Якщо ми додаємо користувача в `signIn` через `updateOne(..., { upsert: true })`, це дублює роботу адаптера й викликає `OAuthAccountNotLinked`.
+
+---
+
+### Документоване рішення
+Про цю проблему в документації [Auth.js MongoDB Adapter](https://authjs.dev/reference/adapter/mongodb):
+- Адаптер підтримує базові методи, але **не згадує** додавання кастомних полів у `users`.
+- У [Customizing Models](https://authjs.dev/reference/core/adapters#customizing-the-adapter) є рекомендація:
+  > "If you need to customize the schema, you can create a custom adapter by extending an existing one or writing your own."
+
+Це означає, що:
+- **Стандартний шлях**: Використовувати `signIn` чи `session` для оновлення даних після створення.
+- **Гнучкий шлях**: Написати кастомний адаптер.
+
+---
+
+### Проблема
+"Це ненормально, коли ми вводимо користувача і не можемо додати свої коментарі". І це правда — у типових системах ми хочемо:
+- Створити користувача з кастомними полями (`role`, `comments`) одразу.
+- Бути незалежними від адаптера чи бази (MongoDB, SQL, Excel).
+
+Наш обхід у `middleware` (`role || "user"`) — це тимчасове рішення, яке не вирішує проблему в базі.
+
+---
+
+### Оптимальне рішення
+#### 1. Оновлення в `signIn` (без конфліктів)
+Ми вже пробували це, і воно працює, якщо не використовувати `upsert`. Робочий `authConfig.js` плюс виправлення:
+
+```javascript
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import clientPromise from "@/utils/db";
+import Google from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
+
+export const authConfig = {
+  adapter: MongoDBAdapter(clientPromise),
+  providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
+    Credentials({
+      name: "Email and Password",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        const client = await clientPromise;
+        const db = client.db();
+        const users = db.collection("users");
+        const user = await users.findOne({ email: credentials.email });
+        if (!user) throw new Error("UserNotRegistered");
+        if (!user.methods?.includes("credentials")) throw new Error("UseDifferentMethod");
+        const isValid = bcrypt.compare(credentials.password, user.password);
+        if (!isValid) throw new Error("InvalidPassword");
+        console.log("Credentials: User authenticated:", { email: credentials.email });
+        return { id: user._id.toString(), email: user.email, role: user.role };
+      },
+    }),
+  ],
+  session: { strategy: "jwt" },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = user.role;
+      }
+      return token;
+    },
+    async signIn({ user, account }) {
+      console.log("signIn called:", { email: user.email, provider: account?.provider });
+      const client = await clientPromise;
+      const db = client.db();
+      const users = db.collection("users");
+
+      if (account?.provider !== "credentials") {
+        const existingUser = await users.findOne({ email: user.email });
+        if (existingUser) {
+          // Оновлюємо тільки якщо role чи comments відсутні
+          const updates = {};
+          if (!existingUser.role) updates.role = "user";
+          if (!existingUser.comments) updates.comments = "Новий користувач через Google";
+          if (Object.keys(updates).length > 0) {
+            await users.updateOne(
+              { email: user.email },
+              { $set: { ...updates, lastLogin: new Date() } }
+            );
+            console.log("Updated user with defaults:", { email: user.email, updates });
+          }
+        }
+        return true;
+      }
+
+      await users.updateOne(
+        { email: user.email },
+        { $set: { lastLogin: new Date() } }
+      );
+      return true;
+    },
+    async session({ session, token }) {
+      const client = await clientPromise;
+      const db = client.db();
+      const user = await db.collection("users").findOne({ email: session.user.email });
+      if (user) {
+        session.user.id = user._id.toString();
+        session.user.name = user.name;
+        session.user.role = user.role;
+        session.user.comments = user.comments;
+        token.role = user.role;
+      }
+      return session;
+    },
+  },
+};
+```
+
+- **Як працює**:
+  - Адаптер створює користувача.
+  - У `signIn` ми перевіряємо, чи є `role`/`comments`, і додаємо їх, якщо відсутні.
+  - У `session` ми переносимо ці дані в токен і сесію.
+
+#### 2. Кастомний адаптер (для повного контролю)
+Якщо ти хочеш позбутися залежності від `MongoDBAdapter` і готуватися до SQL/Excel, ось приклад:
+
+```javascript
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import clientPromise from "@/utils/db";
+
+export function CustomMongoDBAdapter(client) {
+  const adapter = MongoDBAdapter(client);
+
+  const originalCreateUser = adapter.createUser;
+  adapter.createUser = async (data) => {
+    const user = await originalCreateUser(data);
+    const clientInstance = await client;
+    const db = clientInstance.db();
+    await db.collection("users").updateOne(
+      { _id: user._id },
+      { $set: { role: "user", comments: "Створено через кастомний адаптер" } }
+    );
+    return { ...user, role: "user", comments: "Створено через кастомний адаптер" };
+  };
+
+  return adapter;
+}
+
+export const authConfig = {
+  adapter: CustomMongoDBAdapter(clientPromise),
+  // ... решта конфігурації
+};
+```
+
+- **Перевага**: Ти контролюєш створення користувача й можеш додати будь-які поля.
+
+---
+
+### Тестування
+1. Очисти базу.
+2. Увійди через Google із `authConfig.js` (Варіант 1).
+3. Перевір:
+   - База: `{ email: "test@gmail.com", role: "user", comments: "Новий користувач через Google" }`.
+   - Логи: `Updated user with defaults: { email: "test@gmail.com", updates: { role: "user", comments: "..." } }`.
+   - `/admin`: Перенаправлення на `/`.
+
+---
+
+### Висновок
+- **Варіант 1**: Просте рішення, яке працює з `MongoDBAdapter` і додає `role`/`comments` у базу.
+- **Варіант 2**: Кастомний адаптер для повної гнучкості (рекомендую для SQL/Excel у майбутньому).
+
+Я б почав із Варіанту 1, бо він швидший і відповідає твоїй поточній базі. Спробуй його, поділися логами, і якщо все ок — ми вирішимо проблему раз і назавжди! Що скажеш?
