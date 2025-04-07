@@ -9,7 +9,7 @@ export default async function middleware(req) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
 
-  console.log("🚀 ~ Middleware token:", token);
+  // console.log("🚀 ~ Middleware token:", token);
 
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route),
@@ -29,7 +29,7 @@ export default async function middleware(req) {
   if (token) {
     // Вважаємо undefined як "user"
     const role = token.role || "user";
-    console.log("🚀 ~ Effective role:", role);
+    // console.log("🚀 ~ Effective role:", role);
 
     // Блокуємо /admin для "user" (включаючи undefined)
     if (isAdminRoute && role === "user") {
