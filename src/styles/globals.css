@@ -21,6 +21,7 @@
   --foreground: #171717;
   --modal-overlay: rgba(0, 0, 0, 0.5);
   --border-color: #cccccc;
+  --text-color: var(--foreground);
 
   /* Стан hover/active */
   --button-hover-bg: #f5f5f5;
@@ -33,6 +34,7 @@
     --foreground: #ededed;
     --modal-overlay: rgba(0, 0, 0, 0.7);
     --border-color: #444444;
+    --text-color: var(--foreground);
 
     /* Стан hover/active */
     --button-hover-bg: #222222;

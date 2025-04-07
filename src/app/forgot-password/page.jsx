@@ -1,15 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
 
-export default function ResetPasswordPage() {
-  const [password, setPassword] = useState("");
+export default function ForgotPasswordPage() {
+  const [email, setEmail] = useState("");
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,15 +14,15 @@ export default function ResetPasswordPage() {
     setError(null);
     setMessage(null);
 
-    const res = await fetch("/api/reset-password", {
+    const res = await fetch("/api/forgot-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password }),
+      body: JSON.stringify({ email }),
     });
 
     const data = await res.json();
     if (res.ok) {
-      setMessage("Пароль успішно скинуто. Увійдіть із новим паролем.");
+      setMessage("Посилання для скидання пароля надіслано на ваш email");
     } else {
       setError(data.error);
     }
@@ -34,17 +31,17 @@ export default function ResetPasswordPage() {
 
   return (
     <div>
-      <h1>Скидання пароля</h1>
+      <h1>Відновлення пароля</h1>
       <form onSubmit={handleSubmit}>
         <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Новий пароль"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
           required
         />
         <button type="submit" disabled={loading}>
-          {loading ? "Завантаження..." : "Скинути пароль"}
+          {loading ? "Завантаження..." : "Надіслати"}
         </button>
       </form>
       {message && <p style={{ color: "green" }}>{message}</p>}
