@@ -1,9 +1,8 @@
 {
-  "builds": [
-    {
-      "src": "./**/*",
-      "use": "@vercel/node"
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "*": false
     }
-  ],
-  "ignore": "[[ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]] && exit 0 || exit 1"
+  }
 }
