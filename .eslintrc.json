@@ -10,7 +10,6 @@
     "plugin:react/recommended",
     "plugin:prettier/recommended"
   ],
-  "plugins": ["react", "prettier", "@emotion", "markdown"],
   "overrides": [
     {
       "files": ["*.md"],
@@ -49,5 +48,6 @@
     "react": {
       "version": "detect"
     }
-  }
+  },
+  "plugins": ["react", "@emotion", "markdown", "prettier"]
 }
