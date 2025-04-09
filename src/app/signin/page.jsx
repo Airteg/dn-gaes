@@ -1,16 +1,13 @@
-"use client";
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
+import SignInForm from "@/components/signIn/SignInForm.jsx";
+import { Suspense } from "react";
 
-export default function SignIn() {
-  const searchParams = useSearchParams();
-  const error = searchParams.get("error");
-
+export default function SignInPage() {
   return (
     <div>
       <h1>Увійти</h1>
-      {error && <p>Помилка: {error}</p>}
-      <button onClick={() => signIn("google")}>Увійти через Google</button>
+      <Suspense fallback={<p>Завантаження...</p>}>
+        <SignInForm />
+      </Suspense>
     </div>
   );
 }
