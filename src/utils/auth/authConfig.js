@@ -2,6 +2,7 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import clientPromise from "@/utils/db";
+import { ObjectId } from "mongodb";
 
 export const authConfig = {
   providers: [
@@ -65,6 +66,10 @@ export const authConfig = {
           };
           const result = await users.insertOne(newUser);
           user.id = result.insertedId.toString();
+          console.log("✅ Created new Google user:", {
+            email: user.email,
+            id: user.id,
+          });
         } else {
           await users.updateOne(
             { email: user.email },
@@ -73,12 +78,22 @@ export const authConfig = {
               $addToSet: { methods: "google" },
             },
           );
+          user.id = existing._id.toString(); // Завжди встановлюємо user.id
+          console.log("✅ Updated Google user:", {
+            email: user.email,
+            id: user.id,
+          });
         }
       } else if (account.provider === "credentials" && existing) {
         await users.updateOne(
           { email: user.email },
           { $set: { lastLogin: new Date() } },
         );
+        user.id = existing._id.toString(); // На всяк випадок
+        console.log("✅ Updated Credentials user:", {
+          email: user.email,
+          id: user.id,
+        });
       }
       return true;
     },
@@ -88,10 +103,26 @@ export const authConfig = {
         token.role = user.role || "user";
         token.name = user.name;
       }
-      const db = (await clientPromise).db();
-      const dbUser = await db.collection("users").findOne({ _id: token.id });
-      if (dbUser) {
-        token.role = dbUser.role || "user";
+      if (token.id) {
+        try {
+          const db = (await clientPromise).db();
+          const dbUser = await db
+            .collection("users")
+            .findOne({ _id: ObjectId.createFromHexString(token.id) });
+          if (dbUser) {
+            token.role = dbUser.role || "user";
+            console.log("JWT updated:", {
+              email: dbUser.email,
+              role: token.role,
+            });
+          } else {
+            console.log("User not found in jwt callback:", { id: token.id });
+          }
+        } catch (error) {
+          console.error("Error in jwt callback:", error);
+        }
+      } else {
+        console.log("No token.id available in jwt callback");
       }
       return token;
     },
@@ -104,6 +135,14 @@ export const authConfig = {
         session.user.id = user._id.toString();
         session.user.role = user.role || "user";
         session.user.name = user.name;
+        console.log("Session updated:", {
+          email: session.user.email,
+          role: session.user.role,
+        });
+      } else {
+        console.log("User not found in session callback:", {
+          email: session.user.email,
+        });
       }
       return session;
     },
