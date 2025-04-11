@@ -58,8 +58,8 @@ export const authConfig = {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        secure: process.env.NODE_ENV === "production", // true для HTTPS, false для локального HTTP
-        domain: process.env.COOKIE_DOMAIN, // Використовуємо змінну середовища
+        secure: process.env.NODE_ENV === "production",
+        // domain видалений
       },
     },
   },
@@ -159,10 +159,17 @@ export const authConfig = {
           email: session.user.email,
         });
       }
+      // Додаємо дебаг для cookies
+      console.log("Session callback - cookies set:", {
+        sessionToken:
+          process.env.NODE_ENV === "production"
+            ? "__Secure-authjs.session-token"
+            : "authjs.session-token",
+      });
       return session;
     },
     async redirect({ url, baseUrl }) {
-      console.log("Redirect callback:", { url, baseUrl });
+      console.log("Redirect callback - version 2:", { url, baseUrl });
       return url.startsWith("/") ? `${baseUrl}${url}` : url;
     },
   },
