@@ -6,10 +6,23 @@ const adminRoutes = ["/admin"];
 const restrictedAdminRoutes = ["/admin/users"];
 
 export default async function middleware(req) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  // Отримуємо токен із детальнішим логуванням
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+    cookieName: "__Secure-authjs.session-token", // Явно вказуємо ім'я cookie
+    secureCookie: true, // Вказуємо, що це secure cookie (для HTTPS)
+  });
   const { pathname } = req.nextUrl;
 
-  // console.log("🚀 ~ Middleware token:", token);
+  // Логуємо деталі для діагностики
+  console.log("🚀 ~ Middleware details:", {
+    pathname,
+    token, // Логуємо токен (або null, якщо його немає)
+    cookies: req.cookies.getAll(), // Логуємо всі cookies, які приходять із запитом
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET ? "Set" : "Not set", // Перевіряємо, чи є NEXTAUTH_SECRET
+    cookieName: "__Secure-authjs.session-token", // Підтверджуємо ім'я cookie
+  });
 
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route),
@@ -29,7 +42,7 @@ export default async function middleware(req) {
   if (token) {
     // Вважаємо undefined як "user"
     const role = token.role || "user";
-    // console.log("🚀 ~ Effective role:", role);
+    console.log("🚀 ~ Effective role:", role);
 
     // Блокуємо /admin для "user" (включаючи undefined)
     if (isAdminRoute && role === "user") {
@@ -46,3 +59,7 @@ export default async function middleware(req) {
 
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/dashboard", "/admin", "/api/auth/session"],
+};
