@@ -48,6 +48,21 @@ export const authConfig = {
   session: {
     strategy: "jwt",
   },
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === "production"
+          ? `__Secure-authjs.session-token`
+          : `authjs.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production", // true для HTTPS, false для локального HTTP
+        domain: process.env.COOKIE_DOMAIN, // Використовуємо змінну середовища
+      },
+    },
+  },
   callbacks: {
     async signIn({ user, account }) {
       const db = (await clientPromise).db();
@@ -78,7 +93,7 @@ export const authConfig = {
               $addToSet: { methods: "google" },
             },
           );
-          user.id = existing._id.toString(); // Завжди встановлюємо user.id
+          user.id = existing._id.toString();
           console.log("✅ Updated Google user:", {
             email: user.email,
             id: user.id,
@@ -89,7 +104,7 @@ export const authConfig = {
           { email: user.email },
           { $set: { lastLogin: new Date() } },
         );
-        user.id = existing._id.toString(); // На всяк випадок
+        user.id = existing._id.toString();
         console.log("✅ Updated Credentials user:", {
           email: user.email,
           id: user.id,
@@ -145,6 +160,10 @@ export const authConfig = {
         });
       }
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      console.log("Redirect callback:", { url, baseUrl });
+      return url.startsWith("/") ? `${baseUrl}${url}` : url;
     },
   },
 };
