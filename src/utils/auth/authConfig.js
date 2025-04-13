@@ -23,19 +23,26 @@ export const authConfig = {
           .findOne({ email: credentials.email });
 
         if (!user || !user.password) {
-          console.log("User not found or no password:", {
+          console.log("❌ Користувача не знайдено або не встановлено пароль:", {
             email: credentials.email,
           });
+
           return null;
         }
 
         const isValid = await compare(credentials.password, user.password);
         if (!isValid) {
-          console.log("Invalid password:", { email: credentials.email });
+          console.log("🚫 Невірний пароль:", {
+            email: credentials.email,
+          });
+
           return null;
         }
 
-        console.log("User authenticated:", { email: credentials.email });
+        console.log("✅ Користувача автентифіковано:", {
+          email: credentials.email,
+        });
+
         return {
           id: user._id.toString(),
           email: user.email,
@@ -81,7 +88,7 @@ export const authConfig = {
           };
           const result = await users.insertOne(newUser);
           user.id = result.insertedId.toString();
-          console.log("✅ Created new Google user:", {
+          console.log("🆕✅ Створено нового користувача Google:", {
             email: user.email,
             id: user.id,
           });
@@ -94,7 +101,7 @@ export const authConfig = {
             },
           );
           user.id = existing._id.toString();
-          console.log("✅ Updated Google user:", {
+          console.log("🔄✅ Оновлено користувача Google:", {
             email: user.email,
             id: user.id,
           });
@@ -105,7 +112,7 @@ export const authConfig = {
           { $set: { lastLogin: new Date() } },
         );
         user.id = existing._id.toString();
-        console.log("✅ Updated Credentials user:", {
+        console.log("🔐✅ Оновлено користувача Credentials:", {
           email: user.email,
           id: user.id,
         });
@@ -126,18 +133,20 @@ export const authConfig = {
             .findOne({ _id: ObjectId.createFromHexString(token.id) });
           if (dbUser) {
             token.role = dbUser.role || "user";
-            console.log("JWT updated:", {
+            console.log("🔑 JWT оновлено:", {
               email: dbUser.email,
               role: token.role,
             });
           } else {
-            console.log("User not found in jwt callback:", { id: token.id });
+            console.log("❌ Користувача не знайдено в jwt callback:", {
+              id: token.id,
+            });
           }
         } catch (error) {
-          console.error("Error in jwt callback:", error);
+          console.error("🧨 Помилка в jwt callback:", error);
         }
       } else {
-        console.log("No token.id available in jwt callback");
+        console.log("⚠️ Відсутній token.id у jwt callback");
       }
       return token;
     },
@@ -150,26 +159,31 @@ export const authConfig = {
         session.user.id = user._id.toString();
         session.user.role = user.role || "user";
         session.user.name = user.name;
-        console.log("Session updated:", {
+        console.log("🆗 Сесію оновлено:", {
           email: session.user.email,
           role: session.user.role,
         });
       } else {
-        console.log("User not found in session callback:", {
+        console.log("❌ Користувача не знайдено в session callback:", {
           email: session.user.email,
         });
       }
       // Додаємо дебаг для cookies
-      console.log("Session callback - cookies set:", {
+      console.log("🍪 Session callback — встановлено cookie:", {
         sessionToken:
           process.env.NODE_ENV === "production"
             ? "__Secure-authjs.session-token"
             : "authjs.session-token",
       });
+
       return session;
     },
     async redirect({ url, baseUrl }) {
-      console.log("Redirect callback - version 2:", { url, baseUrl });
+      console.log("➡️ Redirect callback — версія 2:", {
+        url,
+        baseUrl,
+      });
+
       return url.startsWith("/") ? `${baseUrl}${url}` : url;
     },
   },

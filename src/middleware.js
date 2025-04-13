@@ -6,22 +6,27 @@ const adminRoutes = ["/admin"];
 const restrictedAdminRoutes = ["/admin/users"];
 
 export default async function middleware(req) {
+  const isProduction = process.env.NODE_ENV === "production";
+  const cookieName = isProduction
+    ? "__Secure-authjs.session-token"
+    : "authjs.session-token";
+  console.log("🌍 NODE_ENV середовище:", process.env.NODE_ENV);
   // Отримуємо токен із детальнішим логуванням
   const token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,
-    cookieName: "__Secure-authjs.session-token", // Явно вказуємо ім'я cookie
+    cookieName, // Ім'я cookie для токена
     secureCookie: true, // Вказуємо, що це secure cookie (для HTTPS)
   });
   const { pathname } = req.nextUrl;
 
   // Логуємо деталі для діагностики
-  console.log("🚀 ~ Middleware details:", {
+  console.log("🛡️ Деталі middleware:", {
     pathname,
     token, // Логуємо токен (або null, якщо його немає)
-    cookies: req.cookies.getAll(), // Логуємо всі cookies, які приходять із запитом
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET ? "Set" : "Not set", // Перевіряємо, чи є NEXTAUTH_SECRET
-    cookieName: "__Secure-authjs.session-token", // Підтверджуємо ім'я cookie
+    cookies: req.cookies.getAll(), // Усі cookies із запиту
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET ? "Set" : "Not set",
+    cookieName: "__Secure-authjs.session-token",
   });
 
   const isProtectedRoute = protectedRoutes.some((route) =>
@@ -34,7 +39,7 @@ export default async function middleware(req) {
 
   // Гість — на логін
   if (isProtectedRoute && !token) {
-    console.log("No token, redirecting to /login from:", pathname);
+    console.log("🚫 Немає токена, перенаправлення на /login з:", pathname);
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
@@ -42,17 +47,23 @@ export default async function middleware(req) {
   if (token) {
     // Вважаємо undefined як "user"
     const role = token.role || "user";
-    console.log("🚀 ~ Effective role:", role);
+    console.log("🧑‍⚖️ Ефективна роль користувача:", role);
 
     // Блокуємо /admin для "user" (включаючи undefined)
     if (isAdminRoute && role === "user") {
-      console.log("Access denied for user:", { email: token.email, role });
+      console.log("⛔ Доступ заборонено для користувача:", {
+        email: token.email,
+        role,
+      });
       return NextResponse.redirect(new URL("/", req.url));
     }
 
     // Блокуємо /admin/users для "moderator"
     if (isRestrictedAdminRoute && role === "moderator") {
-      console.log("Access denied for moderator:", { email: token.email, role });
+      console.log("🚫 Доступ заборонено для модератора:", {
+        email: token.email,
+        role,
+      });
       return NextResponse.redirect(new URL("/admin", req.url));
     }
   }
