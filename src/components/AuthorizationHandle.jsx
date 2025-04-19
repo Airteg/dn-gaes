@@ -3,6 +3,6 @@ import React from "react";
 
 export default async function AuthorizationHandle() {
   const session = await auth();
-  console.log("🚀 ~ session:", session);
+  // console.log("🚀 ~ session:", session);
   return <div>AH</div>;
 }

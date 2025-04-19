@@ -12,7 +12,7 @@ export async function PUT(req, context) {
     const params = await context.params; // Очікуємо проміс
     const id = params.id;
     const data = await req.json();
-    console.log("PUT /api/admin/users/[id] called with id:", id, "data:", data);
+    // console.log("PUT /api/admin/users/[id] called with id:", id, "data:", data);
     // Захист від порожнього name
     if (data.name === "") {
       delete data.name;
@@ -37,7 +37,7 @@ export async function DELETE(req, context) {
   try {
     const params = await context.params; // Очікуємо проміс
     const id = params.id;
-    console.log("DELETE /api/admin/users/[id] called with id:", id);
+    // console.log("DELETE /api/admin/users/[id] called with id:", id);
     const result = await markUserAsDeleted(id);
     if (result.matchedCount === 0) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });

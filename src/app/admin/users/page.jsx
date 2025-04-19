@@ -12,7 +12,7 @@ export default async function UsersPage({ searchParams: searchParamsPromise }) {
 
   // Очікуємо розв’язання промісу
   const searchParams = await searchParamsPromise;
-  console.log("searchParams resolved:", searchParams);
+  // console.log("searchParams resolved:", searchParams);
 
   // Безпечний доступ до параметрів
   const page = Number(searchParams?.page ?? 1);

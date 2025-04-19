@@ -177,7 +177,7 @@ export default function UsersTable({
   });
 
   const handleSave = async (id) => {
-    console.log("Saving user with id:", id, "data:", editData);
+    // console.log("Saving user with id:", id, "data:", editData);
     try {
       // Копіюємо editData, видаляємо порожнє name
       const dataToSend = { ...editData };
@@ -216,7 +216,7 @@ export default function UsersTable({
   };
 
   const handleDelete = async (id) => {
-    console.log("Deleting user with id:", id);
+    // console.log("Deleting user with id:", id);
     try {
       const res = await fetch(`/api/admin/users/${id}`, {
         method: "DELETE",
