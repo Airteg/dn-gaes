@@ -18,7 +18,7 @@ export default async function Menu() {
   return (
     <nav className="bg-gray-800 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <div className="text-lg font-bold">ДНІСТРОВСЬКА ГАЕС</div>
+        <div className="text-lg font-bold">ПрАТ Нижньодністровська ГЕС</div>
         <div className="md:flex md:space-x-4 justify-around md:w-auto">
           <Link href="/" className={linkClasses("/", "/")}>
             Головна
