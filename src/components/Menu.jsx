@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import Image from "next/image.js";
 import Link from "next/link";
 import ButtonLogout from "./ButtonLogout.jsx";
+import ThemeToggleButton from "./ThemeToggleButton.jsx";
 
 export default async function Menu() {
   const session = await auth();
@@ -42,7 +43,7 @@ export default async function Menu() {
           <Link href="/admin" className={linkClasses("/admin", "/admin")}>
             Адміністрування
           </Link>
-          {/* // )} */}
+          <ThemeToggleButton />
         </div>
         <div>
           {user ? (

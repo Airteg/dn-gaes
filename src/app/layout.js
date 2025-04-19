@@ -5,11 +5,11 @@ import AuthProvider from "@/components/providers/AuthProvider";
 export const metadata = {
   title: "Нижньодністровська ГЕС",
   description: "ПрАТ Нижньодністровська ГЕС",
-  keywords: "Нижньодністровська ГЕС, гідроелектростанція, енергетика", // Додано ключові слова
+  keywords: "Нижньодністровська ГЕС, гідроелектростанція, енергетика",
   openGraph: {
     title: "Нижньодністровська ГЕС",
     description: "ПрАТ Нижньодністровська ГЕС",
-    url: "https://your-domain.com", // Замініть на ваш домен
+    url: "https://your-domain.com",
     type: "website",
   },
 };
