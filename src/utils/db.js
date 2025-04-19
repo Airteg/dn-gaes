@@ -10,7 +10,7 @@ const options = {
 };
 
 if (!uri) {
-  throw new Error("❌ MONGODB_URI is not defined in .env.local");
+  throw new Error("🚫 MONGODB_URI не вказано в .env.local");
 }
 
 let client;

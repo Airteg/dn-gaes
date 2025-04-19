@@ -6,7 +6,7 @@ export default async function fetchWithAuth(url, options = {}) {
     Authorization: `Bearer ${token}`,
   };
 
-  console.log("🔍 fetchWithAuth-> Відправлення запиту:", url, options);
+  // console.log("🔍 fetchWithAuth-> Відправлення запиту:", url, options);
   // console.log("📦 Дані, що надсилаються:", JSON.parse(options.body));
   const response = await fetch(url, {
     ...options,
