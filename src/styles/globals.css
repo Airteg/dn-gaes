@@ -15,7 +15,24 @@
   src: url("/fonts/GeistMonoVF.woff") format("woff");
 }
 
-/* Основні стилі */
+/* Теми через CSS-змінні */
+html {
+  --background-image: linear-gradient(#f8fafc, #eff6ff);
+  --foreground: #0f172a;
+  --link-color: #1e293b; /* slate-800 */
+  --link-hover: #0f172a; /* slate-900 */
+  --nav-bg: rgba(243, 244, 246, 0.386); /* gray-100/20 */
+}
+
+html.dark {
+  --background-image: linear-gradient(#0f172a, #1e293b);
+  --foreground: #f1f5f9;
+  --link-color: #f1f5f9; /* slate-100 */
+  --link-hover: #e2e8f0; /* slate-200 */
+  --nav-bg: rgba(31, 41, 55, 0.2); /* gray-800/20 */
+}
+
+/* Базові стилі */
 html,
 body {
   box-sizing: border-box;
@@ -27,15 +44,15 @@ body {
 }
 
 body {
-  @apply bg-[var(--background)] text-[var(--foreground)];
+  background-image: var(--background-image);
+  color: var(--foreground);
   font-family: "GeistVF", Arial, Helvetica, sans-serif;
+  transition:
+    background-image 0.3s ease,
+    color 0.3s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Темна тема */
-.dark body {
-  @apply bg-gray-900 text-gray-100;
+  @apply font-sans;
 }
 
 /* Стилі модального вікна */
