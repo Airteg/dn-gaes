@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import NavLink from "./ui/NavLink";
 import ThemeToggleButton from "./ThemeToggleButton";
@@ -20,25 +19,31 @@ export default function MobileMenu({ user }) {
 
   if (!open && !closing) {
     return (
-      <button
-        onClick={() => setOpen(true)}
-        className="block xl:hidden ml-4"
-        aria-label="Відкрити меню"
-      >
-        <svg
-          className="w-6 h-6"
-          stroke="var(--foreground)"
-          fill="none"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
+      <div className="flex items-center justify-between p-2 xl:hidden">
+        <button
+          onClick={() => setOpen(true)}
+          className="block xl:hidden ml-4"
+          aria-label="Відкрити меню"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M4 6h16M4 12h16M4 18h16"
-          />
-        </svg>
-      </button>
+          <svg
+            className="w-6 h-6"
+            stroke="var(--foreground)"
+            fill="none"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+        <div className="text-sm xl:text-base 2xl:text-lg mr-2 font-bold">
+          ПрAAAАТ Нижньодністровська ГЕС
+        </div>
+        <ThemeToggleButton />
+      </div>
     );
   }
 
@@ -54,7 +59,6 @@ export default function MobileMenu({ user }) {
         <div className="text-sm xl:text-base 2xl:text-lg mr-2 font-bold">
           ПрАТ Нижньодністровська ГЕС
         </div>
-        <ThemeToggleButton />
       </div>
 
       <UserSection user={user} onClose={handleClose} />

@@ -7,7 +7,7 @@ export default function NavLink({ href, children, onClick }) {
   const pathname = usePathname();
   const isActive = pathname === href;
 
-  const base = "block mx-1 py-2 px-4 transition";
+  const base = "block mx-1 py-2 px-2 transition";
   const active =
     "bg-gradient-to-r from-blue-500 to-teal-400 text-white font-medium rounded-md shadow-sm";
   const inactive =

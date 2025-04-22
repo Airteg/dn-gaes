@@ -9,15 +9,17 @@ export default async function Menu() {
   const user = session?.user;
 
   return (
-    <nav className="bg-[var(--nav-bg)] text-[var(--foreground)] p-4">
-      <div className="hidden xl:flex w-full max-w-[1280px] mx-auto items-center justify-between gap-4">
+    <nav className="bg-[var(--nav-bg)] text-[var(--foreground)] p-4 border border-amber-600">
+      {/* MobileMenu — рендериться завжди, але показує себе сам */}
+      <MobileMenu user={user} />
+      <div className="hidden xl:flex w-full  mx-auto items-center justify-between gap-4 border border-amber-500">
         {/* Ліво: Заголовок */}
-        <div className="text-sm xl:text-base 2xl:text-lg font-bold">
-          <h5>ПрАТ Нижньодністровська ГЕС</h5>
+        <div className="text-sm xl:text-base 2xl:text-lg font-bold border border-amber-600">
+          <h5>Нижньодністровська ГЕС</h5>
         </div>
 
         {/* Центр: Навігація */}
-        <div className="flex gap-4">
+        <div className="flex gap-0.5 border border-amber-600">
           <NavLink href="/">Головна</NavLink>
           <NavLink href="/news">Новини</NavLink>
           <NavLink href="/documents">Документи</NavLink>
@@ -26,14 +28,11 @@ export default async function Menu() {
         </div>
 
         {/* Право: Юзер і Тема */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-0.5 border border-amber-600">
           <UserSection user={user} />
           <ThemeToggleButton />
         </div>
       </div>
-
-      {/* MobileMenu — рендериться завжди, але показує себе сам */}
-      <MobileMenu user={user} />
     </nav>
   );
 }

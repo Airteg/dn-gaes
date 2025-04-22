@@ -17,7 +17,7 @@ export default function UserSection({ user, onClose }) {
       <NavLink href="/dashboard" onClick={onClose}>
         <div className="flex flex-col">
           <p>{user.name}</p>
-          <p className="text-sm">({user.role})</p>
+          {/* <p className="text-sm">({user.role})</p> */}
         </div>
       </NavLink>
       <ButtonLogout />
