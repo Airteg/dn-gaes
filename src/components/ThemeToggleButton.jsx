@@ -32,7 +32,7 @@ export default function ThemeToggleButton() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-full bg-gray-700 text-yellow-300 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-300"
+      className="p-2 rounded-full   text-[var(--foreground)] bg-[var(--nav-bg)] hover:bg-gray-600 focus:outline-none focus:outline-none focus:ring-2 focus:ring-[var(--foreground)]"
       aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
     >
       {theme === "light" ? (

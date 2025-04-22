@@ -4,85 +4,94 @@ import Image from "next/image";
 import { useState } from "react";
 import NavLink from "./ui/NavLink";
 import ThemeToggleButton from "./ThemeToggleButton";
-import ButtonLogout from "./ButtonLogout";
+import UserSection from "./UserSection";
 
 export default function MobileMenu({ user }) {
   const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
 
-  if (!open) {
+  const handleClose = () => {
+    setClosing(true);
+    setTimeout(() => {
+      setClosing(false);
+      setOpen(false);
+    }, 300); // тривалість анімації
+  };
+
+  if (!open && !closing) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="block min-[1480px]:hidden ml-4"
-        aria-label="Open menu"
+        className="block xl:hidden ml-4"
+        aria-label="Відкрити меню"
       >
         <svg
-          width="24"
-          height="24"
-          stroke="currentColor"
+          className="w-6 h-6"
+          stroke="var(--foreground)"
           fill="none"
           strokeWidth="2"
+          viewBox="0 0 24 24"
         >
-          <path d="M4 6h16M4 12h16M4 18h16" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
         </svg>
       </button>
     );
   }
 
   return (
-    <div className="absolute top-0 left-0 w-full h-screen bg-[var(--background)]/95 z-50 p-6 text-[var(--foreground)] flex flex-col gap-6">
-      {/* Верхній блок */}
-      <div className="flex justify-between items-center border-b border-[var(--foreground)] pb-4">
-        <div className="text-center leading-5">
-          <h5>ПрАТ</h5>
-          <h5>Нижньодністровська</h5>
-          <h5>ГЕС</h5>
+    <div
+      className={`
+        ${closing ? "slide-left" : "slide-right"}
+        z-50 absolute top-0 left-0 w-full h-screen menu-gradient p-6
+        text-[var(--foreground)] flex flex-col gap-6
+      `}
+    >
+      <div className="flex justify-start items-center border-b border-[var(--foreground)] pb-4">
+        <div className="text-sm xl:text-base 2xl:text-lg mr-2 font-bold">
+          ПрАТ Нижньодністровська ГЕС
         </div>
         <ThemeToggleButton />
       </div>
 
-      {/* Блок юзера */}
-      <div className="flex items-center gap-3 border-b border-[var(--foreground)] pb-4">
-        {user?.image && (
-          <Image
-            src={user.image}
-            width={40}
-            height={40}
-            alt={user.name ?? "Avatar"}
-            style={{ borderRadius: "50%" }}
-          />
-        )}
-        <div className="flex flex-col">
-          {user ? (
-            <>
-              <NavLink href="/dashboard">
-                <p>{user.name}</p>
-                <p>({user.role})</p>
-              </NavLink>
-              <ButtonLogout />
-            </>
-          ) : (
-            <NavLink href="/login">Увійти</NavLink>
-          )}
-        </div>
+      <UserSection user={user} onClose={handleClose} />
+
+      <div className="flex flex-col gap-2 border-t border-[var(--foreground)]">
+        <NavLink href="/" onClick={handleClose}>
+          Головна
+        </NavLink>
+        <NavLink href="/news" onClick={handleClose}>
+          Новини
+        </NavLink>
+        <NavLink href="/documents" onClick={handleClose}>
+          Документи
+        </NavLink>
+        <NavLink href="/contacts" onClick={handleClose}>
+          Контакти
+        </NavLink>
       </div>
 
-      {/* Навігація */}
-      <div className="flex flex-col gap-2">
-        <NavLink href="/">Головна</NavLink>
-        <NavLink href="/news">Новини</NavLink>
-        <NavLink href="/documents">Документи</NavLink>
-        <NavLink href="/contacts">Контакти</NavLink>
-        <NavLink href="/admin">Адміністрування</NavLink>
-      </div>
-
-      {/* Закрити */}
       <button
-        onClick={() => setOpen(false)}
-        className="absolute top-4 right-4 text-2xl text-[var(--foreground)]"
+        onClick={handleClose}
+        className="absolute top-4 right-4 text-2xl text-[var(--foreground)] p-2"
         aria-label="Закрити меню"
       >
-        ✖
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          strokeWidth="2"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
       </button>
     </div>
   );

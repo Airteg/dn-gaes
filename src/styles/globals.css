@@ -17,19 +17,30 @@
 
 /* Теми через CSS-змінні */
 html {
-  --background-image: linear-gradient(#f8fafc, #eff6ff);
+  /* --background-image: linear-gradient(#f1f5f9, #dbeafe); */
+  /* --background-image: linear-gradient(rgba(241, 245, 249, 0.9), rgba(219, 234, 254, 0.9)); */
+  --background-image: linear-gradient(to bottom right, #f1f5f9, #dbeafe);
+
+  --background: #f8fafc; /* Додаємо для MobileMenu */
   --foreground: #0f172a;
-  --link-color: #1e293b; /* slate-800 */
-  --link-hover: #0f172a; /* slate-900 */
-  --nav-bg: rgba(243, 244, 246, 0.386); /* gray-100/20 */
+  --link-color: #1e293b;
+  --link-hover: #0f172a;
+  --nav-bg: rgba(243, 244, 246, 0.386);
+  --menu-bg: linear-gradient(rgba(248, 250, 252, 0.95), rgba(239, 246, 255, 0.95)); /* gray-50 → blue-50 */
+  --modal-overlay: rgba(0, 0, 0, 0.5);
+  --border-color: #d1d5db; /* gray-300 */
 }
 
 html.dark {
   --background-image: linear-gradient(#0f172a, #1e293b);
+  --background: #0f172a;
   --foreground: #f1f5f9;
-  --link-color: #f1f5f9; /* slate-100 */
-  --link-hover: #e2e8f0; /* slate-200 */
-  --nav-bg: rgba(31, 41, 55, 0.2); /* gray-800/20 */
+  --link-color: #f1f5f9;
+  --link-hover: #e2e8f0;
+  --nav-bg: rgba(31, 41, 55, 0.2);
+  --menu-bg: linear-gradient(rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)); /* slate-900 → slate-800 */
+  --modal-overlay: rgba(0, 0, 0, 0.7);
+  --border-color: #4b5563; /* gray-600 */
 }
 
 /* Базові стилі */
@@ -55,6 +66,16 @@ body {
   @apply font-sans;
 }
 
+nav {
+  background: var(--nav-bg);
+  color: var(--foreground);
+}
+.menu-gradient {
+  background-image: var(--menu-bg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
 /* Стилі модального вікна */
 .modal-overlay {
   @apply bg-[var(--modal-overlay)];
@@ -81,4 +102,63 @@ body {
 .title {
   @apply text-5xl font-bold;
   text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
+}
+@keyframes slideDown {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.slide-down {
+  animation: slideDown 0.3s ease-out forwards;
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.3s ease-in forwards;
+}
+
+@keyframes slideRight {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.slide-right {
+  animation: slideRight 0.3s ease-out forwards;
+}
+
+@keyframes slideLeft {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+.slide-left {
+  animation: slideLeft 0.3s ease-in forwards;
 }

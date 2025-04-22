@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function NavLink({ href, children }) {
+export default function NavLink({ href, children, onClick }) {
   const pathname = usePathname();
   const isActive = pathname === href;
 
@@ -14,7 +14,11 @@ export default function NavLink({ href, children }) {
     "text-[var(--link-color)] hover:text-[var(--link-hover)] hover:underline";
 
   return (
-    <Link href={href} className={`${base} ${isActive ? active : inactive}`}>
+    <Link
+      href={href}
+      onClick={onClick}
+      className={`${base} ${isActive ? active : inactive}`}
+    >
       {children}
     </Link>
   );
