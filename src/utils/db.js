@@ -1,30 +1,34 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
+import mongoose from "mongoose";
 
-const uri = process.env.MONGODB_URI;
-const options = {
-  // serverApi: {
-  //   version: ServerApiVersion.v1,
-  //   strict: true,
-  //   deprecationErrors: true,
-  // },
-};
+const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!uri) {
+if (!MONGODB_URI) {
   throw new Error("🚫 MONGODB_URI не вказано в .env.local");
 }
 
-let client;
-let clientPromise;
+let cached = global.mongoose;
 
-if (process.env.NODE_ENV === "development") {
-  if (!global._mongoClientPromise) {
-    client = new MongoClient(uri, options);
-    global._mongoClientPromise = client.connect();
-  }
-  clientPromise = global._mongoClientPromise;
-} else {
-  client = new MongoClient(uri, options);
-  clientPromise = client.connect();
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
 }
 
-export default clientPromise;
+async function connectToDatabase() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+    };
+
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      return mongoose;
+    });
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
+
+export { connectToDatabase };

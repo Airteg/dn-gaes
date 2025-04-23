@@ -1,23 +1,32 @@
+import { getSession } from "next-auth/react";
+
 export default async function fetchWithAuth(url, options = {}) {
-  const token = localStorage.getItem("token");
+  const session = await getSession();
+  const token = session?.token || session?.user?.token;
+
+  if (!token) {
+    console.warn("⚠️ Токен не знайдено в сесії");
+  }
 
   const headers = {
     ...(options.headers || {}),
     Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
   };
 
-  // console.log("🔍 fetchWithAuth-> Відправлення запиту:", url, options);
-  // console.log("📦 Дані, що надсилаються:", JSON.parse(options.body));
   const response = await fetch(url, {
     ...options,
     headers,
   });
 
   if (!response.ok) {
-    console.error(
-      `❌ Помилка запиту: ${response.status} ${response.statusText}`,
-    );
-    return null;
+    const text = await response.text();
+    console.error("❌ Помилка запиту:", {
+      status: response.status,
+      statusText: response.statusText,
+      response: text,
+    });
+    throw new Error("Не вдалося завантажити дані");
   }
 
   return response.json();

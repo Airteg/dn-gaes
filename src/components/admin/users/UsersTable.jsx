@@ -10,8 +10,8 @@ import {
 import { useRouter } from "next/navigation";
 
 export default function UsersTable({
-  users,
-  total,
+  users = [], // Дефолтне значення
+  total = 0,
   page,
   filter,
   showDeleted = false,
@@ -20,7 +20,7 @@ export default function UsersTable({
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
   const [localShowDeleted, setLocalShowDeleted] = useState(showDeleted);
-
+  console.log("🚀 ~ users:", users);
   const columns = [
     {
       accessorKey: "createdAt",
@@ -169,7 +169,7 @@ export default function UsersTable({
   ];
 
   const table = useReactTable({
-    data: users,
+    data: Array.isArray(users) ? users : [], // Захист
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -283,14 +283,14 @@ export default function UsersTable({
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-gray-200/30">
+          <thead className="bg-gray-50/30">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider"
                   >
                     {flexRender(
                       header.column.columnDef.header,
@@ -301,43 +301,51 @@ export default function UsersTable({
               </tr>
             ))}
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="px-6 py-4 whitespace-nowrap align-top"
-                  >
-                    <div className="flex flex-col space-y-1">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                      {cell.column.id !== "actions" &&
-                        cell.column.id !== "email" && (
-                          <div className="text-sm text-gray-500">
-                            {cell.column.id === "email" && (
-                              <span>Email: {row.original.email}</span>
-                            )}
-                            {row.original.nickname && (
-                              <span>Нікнейм: {row.original.nickname}</span>
-                            )}
-                            {row.original.position && (
-                              <span>Посада: {row.original.position}</span>
-                            )}
-                            {row.original.placeOfWork && (
-                              <span>
-                                Місце роботи: {row.original.placeOfWork}
-                              </span>
-                            )}
-                          </div>
+          <tbody className="bg-white/10 divide-y divide-gray-200">
+            {table.getRowModel()?.rows?.length > 0 ? (
+              table.getRowModel().rows.map((row) => (
+                <tr key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <td
+                      key={cell.id}
+                      className="px-6 py-4 whitespace-nowrap align-top"
+                    >
+                      <div className="flex flex-col space-y-1">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
                         )}
-                    </div>
-                  </td>
-                ))}
+                        {cell.column.id !== "actions" &&
+                          cell.column.id !== "email" && (
+                            <div className="text-sm text-gray-800">
+                              {cell.column.id === "email" && (
+                                <span>Email: {row.original.email}</span>
+                              )}
+                              {row.original.nickname && (
+                                <span>Нікнейм: {row.original.nickname}</span>
+                              )}
+                              {row.original.position && (
+                                <span>Посада: {row.original.position}</span>
+                              )}
+                              {row.original.placeOfWork && (
+                                <span>
+                                  Місце роботи: {row.original.placeOfWork}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={columns.length} className="text-center py-4">
+                  Немає користувачів
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
@@ -352,7 +360,7 @@ export default function UsersTable({
             )
           }
           disabled={page === 1}
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+          className="px-4 py-2 bg-gray-200/10 rounded disabled:opacity-50"
         >
           Попередня
         </button>
@@ -368,7 +376,7 @@ export default function UsersTable({
             )
           }
           disabled={page >= Math.ceil(total / 10)}
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+          className="px-4 py-2 bg-gray-200/10 rounded disabled:opacity-50"
         >
           Наступна
         </button>

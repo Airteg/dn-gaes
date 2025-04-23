@@ -1,58 +1,52 @@
-import { NextResponse } from "next/server";
-import { authMiddleware } from "@/middleware/authMiddleware";
-import User from "@/models/User";
-import connectToDatabase from "@/utils/db";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import UsersTable from "@/components/admin/users/UsersTable";
 
-// 🔹 Отримати список користувачів (тільки для адмінів)
-async function getUsers(req) {
-  await connectToDatabase();
+export default async function UsersPage({ searchParams: searchParamsPromise }) {
+  const session = await auth();
 
-  const users = await User.find().select("-password"); // Вилучаємо поле пароля
-  return NextResponse.json(users);
-}
-
-// 🔹 Оновити статус або роль користувача (тільки для адмінів)
-async function updateUser(req) {
-  await connectToDatabase();
-  const { id, status, role } = await req.json();
-
-  // Перевіряємо, чи користувач існує
-  const user = await User.findById(id);
-  if (!user) {
-    return NextResponse.json(
-      { error: "Користувач не знайдений" },
-      { status: 404 },
-    );
+  if (!session?.user || session.user.role !== "admin") {
+    redirect("/login");
   }
 
-  // Оновлюємо статус або роль, якщо передано
-  if (status) user.status = status;
-  if (role) user.role = role;
+  const searchParams = await searchParamsPromise;
+  const page = Number(searchParams?.page ?? 1);
+  const filter = searchParams?.filter ?? "";
+  const showDeleted = searchParams?.showDeleted === "true";
 
-  await user.save();
-  return NextResponse.json({ message: "Користувача оновлено" });
+  // Використовуємо відносний URL, який працює і на локалі, і на продакшені
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const res = await fetch(
+    `${baseUrl}/api/admin/users?page=${page}&filter=${encodeURIComponent(filter)}&showDeleted=${showDeleted}`,
+    { cache: "no-store" },
+  );
+  const { users = [], total = 0 } = await res.json();
+
+  const serializedUsers = users.map((user) => ({
+    _id: user._id.toString(),
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    status: user.status,
+    isDeleted: user.isDeleted,
+    createdAt: user.createdAt,
+    nickname: user.nickname,
+    position: user.position,
+    placeOfWork: user.placeOfWork,
+  }));
+
+  console.log("🚀 ~ serializedUsers:", serializedUsers);
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-2xl font-bold mb-6">Керування користувачами</h1>
+      <UsersTable
+        users={serializedUsers}
+        total={total}
+        page={page}
+        filter={filter}
+        showDeleted={showDeleted}
+      />
+    </div>
+  );
 }
-
-// 🔹 Видалити користувача (м'яке видалення)
-async function deleteUser(req) {
-  await connectToDatabase();
-  const { id } = await req.json();
-
-  const user = await User.findById(id);
-  if (!user) {
-    return NextResponse.json(
-      { error: "Користувач не знайдений" },
-      { status: 404 },
-    );
-  }
-
-  user.isDeleted = true; // Позначаємо як видаленого
-  await user.save();
-
-  return NextResponse.json({ message: "Користувача видалено" });
-}
-
-// 🛡 Додаємо захист для адмінів
-export const GET = authMiddleware(getUsers, "admin");
-export const PATCH = authMiddleware(updateUser, "admin");
-export const DELETE = authMiddleware(deleteUser, "admin");

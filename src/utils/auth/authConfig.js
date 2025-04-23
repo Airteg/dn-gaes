@@ -1,8 +1,8 @@
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
-import clientPromise from "@/utils/db";
-import { ObjectId } from "mongodb";
+import { connectToDatabase } from "@/utils/db"; // Оновлений імпорт
+import User from "@/models/User"; // Нова модель
 
 export const authConfig = {
   providers: [
@@ -17,16 +17,13 @@ export const authConfig = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const db = (await clientPromise).db();
-        const user = await db
-          .collection("users")
-          .findOne({ email: credentials.email });
+        await connectToDatabase();
+        const user = await User.findOne({ email: credentials.email });
 
         if (!user || !user.password) {
           console.log("❌ Користувача не знайдено або не встановлено пароль:", {
             email: credentials.email,
           });
-
           return null;
         }
 
@@ -35,7 +32,6 @@ export const authConfig = {
           console.log("🚫 Невірний пароль:", {
             email: credentials.email,
           });
-
           return null;
         }
 
@@ -66,34 +62,32 @@ export const authConfig = {
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
-        // domain видалений
       },
     },
   },
   callbacks: {
     async signIn({ user, account }) {
-      const db = (await clientPromise).db();
-      const users = db.collection("users");
-      const existing = await users.findOne({ email: user.email });
+      await connectToDatabase();
+      const existing = await User.findOne({ email: user.email });
 
       if (account.provider === "google") {
         if (!existing) {
-          const newUser = {
+          const newUser = new User({
             email: user.email,
             name: user.name,
             role: "user",
             methods: ["google"],
             createdAt: new Date(),
             lastLogin: new Date(),
-          };
-          const result = await users.insertOne(newUser);
-          user.id = result.insertedId.toString();
+          });
+          const savedUser = await newUser.save();
+          user.id = savedUser._id.toString();
           console.log("🆕✅ Створено нового користувача Google:", {
             email: user.email,
             id: user.id,
           });
         } else {
-          await users.updateOne(
+          await User.updateOne(
             { email: user.email },
             {
               $set: { lastLogin: new Date() },
@@ -107,7 +101,7 @@ export const authConfig = {
           });
         }
       } else if (account.provider === "credentials" && existing) {
-        await users.updateOne(
+        await User.updateOne(
           { email: user.email },
           { $set: { lastLogin: new Date() } },
         );
@@ -127,16 +121,14 @@ export const authConfig = {
       }
       if (token.id) {
         try {
-          const db = (await clientPromise).db();
-          const dbUser = await db
-            .collection("users")
-            .findOne({ _id: ObjectId.createFromHexString(token.id) });
+          await connectToDatabase();
+          const dbUser = await User.findById(token.id);
           if (dbUser) {
             token.role = dbUser.role || "user";
-            console.log("🔑 JWT оновлено:", {
-              email: dbUser.email,
-              role: token.role,
-            });
+            // console.log("🔑 JWT оновлено:", {
+            //   email: dbUser.email,
+            //   role: token.role,
+            // });
           } else {
             console.log("❌ Користувача не знайдено в jwt callback:", {
               id: token.id,
@@ -151,39 +143,34 @@ export const authConfig = {
       return token;
     },
     async session({ session, token }) {
-      const db = (await clientPromise).db();
-      const user = await db
-        .collection("users")
-        .findOne({ email: session.user.email });
+      await connectToDatabase();
+      const user = await User.findOne({ email: session.user.email });
       if (user) {
         session.user.id = user._id.toString();
         session.user.role = user.role || "user";
         session.user.name = user.name;
-        console.log("🆗 Сесію оновлено:", {
-          email: session.user.email,
-          role: session.user.role,
-        });
+        // console.log("🆗 Сесію оновлено:", {
+        //   email: session.user.email,
+        //   role: session.user.role,
+        // });
       } else {
         console.log("❌ Користувача не знайдено в session callback:", {
           email: session.user.email,
         });
       }
-      // Додаємо дебаг для cookies
-      console.log("🍪 Session callback — встановлено cookie:", {
-        sessionToken:
-          process.env.NODE_ENV === "production"
-            ? "__Secure-authjs.session-token"
-            : "authjs.session-token",
-      });
-
+      // console.log("🍪 Session callback — встановлено cookie:", {
+      //   sessionToken:
+      //     process.env.NODE_ENV === "production"
+      //       ? "__Secure-authjs.session-token"
+      //       : "authjs.session-token",
+      // });
       return session;
     },
     async redirect({ url, baseUrl }) {
-      console.log("➡️ Redirect callback — версія 2:", {
-        url,
-        baseUrl,
-      });
-
+      // console.log("➡️ Redirect callback — версія 2:", {
+      //   url,
+      //   baseUrl,
+      // });
       return url.startsWith("/") ? `${baseUrl}${url}` : url;
     },
   },

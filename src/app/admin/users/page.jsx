@@ -1,37 +1,28 @@
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
-import UsersTable from "@/components/admin/users/UsersTable";
-import { getUsers } from "@/utils/db/users";
+"use client";
 
-export default async function UsersPage({ searchParams: searchParamsPromise }) {
-  const session = await auth();
+import { useSearchParams, useRouter } from "next/navigation";
+import UsersTable from "@/components/admin/users/UsersTable.jsx";
+import { useUsers } from "@/hooks/useUsers";
 
-  if (!session?.user || session.user.role !== "admin") {
-    redirect("/login");
-  }
+export default function UsersPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-  // Очікуємо розв’язання промісу
-  const searchParams = await searchParamsPromise;
-  // console.log("searchParams resolved:", searchParams);
+  const page = Number(searchParams.get("page") || 1);
+  const filter = searchParams.get("filter") || "";
+  const showDeleted = searchParams.get("showDeleted") === "true";
 
-  // Безпечний доступ до параметрів
-  const page = Number(searchParams?.page ?? 1);
-  const filter = searchParams?.filter ?? "";
-  const showDeleted = searchParams?.showDeleted === "true";
+  const { data, isLoading, error } = useUsers({ filter, showDeleted, page });
 
-  const { users, total } = await getUsers({
-    page,
-    limit: 10,
-    filter,
-    showDeleted,
-  });
+  if (isLoading) return <p>Завантаження...</p>;
+  if (error) return <p>❌ Помилка: {error.message}</p>;
 
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-2xl font-bold mb-6">Керування користувачами</h1>
       <UsersTable
-        users={users}
-        total={total}
+        users={data.users}
+        total={data.total}
         page={page}
         filter={filter}
         showDeleted={showDeleted}

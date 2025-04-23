@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
-import { updateUser, markUserAsDeleted } from "@/utils/db/users";
+import { connectToDatabase } from "@/utils/db";
+import User from "@/models/User";
 import { NextResponse } from "next/server";
 
 export async function PUT(req, context) {
@@ -9,16 +10,18 @@ export async function PUT(req, context) {
   }
 
   try {
-    const params = await context.params; // Очікуємо проміс
+    const params = await context.params;
     const id = params.id;
     const data = await req.json();
-    // console.log("PUT /api/admin/users/[id] called with id:", id, "data:", data);
-    // Захист від порожнього name
+
     if (data.name === "") {
       delete data.name;
     }
-    const result = await updateUser(id, data);
-    if (result.matchedCount === 0) {
+
+    await connectToDatabase();
+    const result = await User.findByIdAndUpdate(id, data, { new: true });
+
+    if (!result) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
     return NextResponse.json({ message: "User updated" });
@@ -35,11 +38,17 @@ export async function DELETE(req, context) {
   }
 
   try {
-    const params = await context.params; // Очікуємо проміс
+    const params = await context.params;
     const id = params.id;
-    // console.log("DELETE /api/admin/users/[id] called with id:", id);
-    const result = await markUserAsDeleted(id);
-    if (result.matchedCount === 0) {
+
+    await connectToDatabase();
+    const result = await User.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true },
+    );
+
+    if (!result) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
     return NextResponse.json({ message: "User marked as deleted" });

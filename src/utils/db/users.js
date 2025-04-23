@@ -1,83 +1,42 @@
-import clientPromise from "../db.js";
-import { ObjectId } from "mongodb";
+import { connectToDatabase } from "../db";
+import User from "@/models/User";
 
-export async function getUsers({
-  page = 1,
+export const getUsers = async ({
+  filter = {},
+  sort = { createdAt: -1 },
+  skip = 0,
   limit = 10,
-  filter = "",
   showDeleted = false,
-} = {}) {
-  const client = await clientPromise;
-  const db = client.db("dn-gaes");
+} = {}) => {
+  await connectToDatabase();
 
   const query = {
-    ...(filter
-      ? {
-          $or: [
-            { firstName: { $regex: filter, $options: "i" } },
-            { lastName: { $regex: filter, $options: "i" } },
-            { email: { $regex: filter, $options: "i" } },
-          ],
-        }
-      : {}),
-    ...(showDeleted ? {} : { isDeleted: { $ne: true } }),
+    ...filter,
+    ...(showDeleted
+      ? {} // Якщо showDeleted = true, показуємо всіх (і видалених, і невидалених)
+      : { $or: [{ isDeleted: false }, { isDeleted: { $exists: false } }] }),
   };
+  console.log("🔍 Запит до БД:", query);
+  const users = await User.find(query).sort(sort).skip(skip).limit(limit);
+  const total = await User.countDocuments(query);
+  // console.log("📊 Знайдені користувачі:", users);
+  console.log("📊 Загальна кількість:", total);
 
-  const users = await db
-    .collection("users")
-    .find(query)
-    .skip((page - 1) * limit)
-    .limit(limit)
-    .toArray();
+  return { users, total };
+};
 
-  const total = await db.collection("users").countDocuments(query);
-
-  return {
-    users: users.map((user) => ({
-      ...user,
-      _id: user._id.toString(),
-      name: [user.firstName, user.lastName].filter(Boolean).join(" ") || "",
-    })),
-    total,
-  };
-}
-
-export async function updateUser(id, data) {
-  const client = await clientPromise;
-  const db = client.db("dn-gaes");
-
-  const updateData = {
-    ...(data.name
-      ? {
-          firstName: data.name.trim().split(" ")[0],
-          lastName: data.name.trim().split(" ").slice(1).join(" ") || "",
-        }
-      : {}),
-    ...(data.role ? { role: data.role } : {}),
-    ...(data.status ? { status: data.status } : {}),
-    ...(typeof data.isDeleted === "boolean"
-      ? { isDeleted: data.isDeleted }
-      : {}),
-    updatedAt: new Date(),
-  };
-
-  const result = await db
-    .collection("users")
-    .updateOne({ _id: new ObjectId(id) }, { $set: updateData });
-
+export const updateUser = async (id, updates) => {
+  await connectToDatabase();
+  const result = await User.findByIdAndUpdate(id, updates, { new: true });
   return result;
-}
+};
 
-export async function markUserAsDeleted(id) {
-  const client = await clientPromise;
-  const db = client.db("dn-gaes");
-
-  const result = await db
-    .collection("users")
-    .updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { isDeleted: true, updatedAt: new Date() } },
-    );
-
+export const markUserAsDeleted = async (id) => {
+  await connectToDatabase();
+  const result = await User.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    { new: true },
+  );
   return result;
-}
+};
