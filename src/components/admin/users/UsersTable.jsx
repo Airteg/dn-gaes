@@ -8,6 +8,7 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function UsersTable({
   users = [], // Дефолтне значення
@@ -20,7 +21,8 @@ export default function UsersTable({
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
   const [localShowDeleted, setLocalShowDeleted] = useState(showDeleted);
-  console.log("🚀 ~ users:", users);
+
+  // console.log("🚀📡 ~ UsersTable: users->", users);
   const columns = [
     {
       accessorKey: "createdAt",
@@ -45,7 +47,9 @@ export default function UsersTable({
             className="p-1 border rounded w-full"
           />
         ) : (
-          row.original.name
+          row.original.name ||
+          row.original.nickname ||
+          row.original.email.split("@")[0]
         ),
     },
     {
@@ -175,7 +179,7 @@ export default function UsersTable({
     getPaginationRowModel: getPaginationRowModel(),
     initialState: { pagination: { pageSize: 10, pageIndex: page - 1 } },
   });
-
+  const queryClient = useQueryClient();
   const handleSave = async (id) => {
     // console.log("Saving user with id:", id, "data:", editData);
     try {
@@ -191,11 +195,7 @@ export default function UsersTable({
       });
       if (res.ok) {
         setEditingId(null);
-        router.push(
-          `/admin/users?page=${page}&filter=${encodeURIComponent(
-            filter,
-          )}&showDeleted=${localShowDeleted}`,
-        );
+        await queryClient.invalidateQueries({ queryKey: ["users"] });
       } else {
         const text = await res.text();
         console.error("Помилка оновлення користувача:", {

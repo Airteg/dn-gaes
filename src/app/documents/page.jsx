@@ -1,59 +1,46 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import fetchWithAuth from "@/utils/fetchWithAuth";
+import { useState, useMemo } from "react";
+import { useDocuments } from "@/hooks/useDocuments";
 
 export default function DocumentsPage() {
-  const [documents, setDocuments] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const { data: documents = [], isLoading, error } = useDocuments();
+
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [subcategories, setSubcategories] = useState([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
-  const [filteredDocuments, setFilteredDocuments] = useState([]);
 
-  useEffect(() => {
-    fetchWithAuth("/api/documents")
-      .then((data) => {
-        setDocuments(data);
-        const uniqueCategories = [...new Set(data.map((doc) => doc.category))];
-        setCategories(uniqueCategories);
-      })
-      .catch((err) =>
-        console.error("❌ Помилка завантаження документів:", err),
-      );
-  }, []);
+  const categories = useMemo(
+    () => [...new Set(documents.map((doc) => doc.category))],
+    [documents],
+  );
 
-  const handleCategorySelect = (category) => {
-    setSelectedCategory(category);
-    setSelectedSubcategory(null);
-    const subcats = [
+  const subcategories = useMemo(() => {
+    return [
       ...new Set(
         documents
-          .filter((doc) => doc.category === category && doc.subcategory)
+          .filter((doc) => doc.category === selectedCategory && doc.subcategory)
           .map((doc) => doc.subcategory),
       ),
     ];
-    setSubcategories(subcats);
-    setFilteredDocuments(
-      documents.filter((doc) => doc.category === category && !doc.subcategory),
-    );
-  };
+  }, [selectedCategory, documents]);
 
-  const handleSubcategorySelect = (subcategory) => {
-    setSelectedSubcategory(subcategory);
-    setFilteredDocuments(
-      documents.filter(
-        (doc) =>
-          doc.category === selectedCategory && doc.subcategory === subcategory,
-      ),
-    );
-  };
+  const filteredDocuments = useMemo(() => {
+    return documents.filter((doc) => {
+      if (doc.category !== selectedCategory) return false;
+      if (!selectedSubcategory && doc.subcategory) return false;
+      if (selectedSubcategory && doc.subcategory !== selectedSubcategory)
+        return false;
+      return true;
+    });
+  }, [documents, selectedCategory, selectedSubcategory]);
+
+  if (isLoading) return <p>Завантаження...</p>;
+  if (error) return <p>❌ Помилка: {error.message}</p>;
 
   return (
     <div className="p-4 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold text-center mb-6">Документи</h1>
 
-      {/* Вкладки категорій */}
       <div className="flex overflow-x-auto space-x-2 border-b pb-2">
         {categories.map((category) => (
           <button
@@ -63,14 +50,16 @@ export default function DocumentsPage() {
                 ? "bg-blue-500 text-white"
                 : "bg-gray-200/30"
             }`}
-            onClick={() => handleCategorySelect(category)}
+            onClick={() => {
+              setSelectedCategory(category);
+              setSelectedSubcategory(null);
+            }}
           >
             {category}
           </button>
         ))}
       </div>
 
-      {/* Вкладки підкатегорій */}
       {subcategories.length > 0 && (
         <div className="flex overflow-x-auto space-x-2 border-b py-2 mt-4">
           {subcategories.map((subcategory) => (
@@ -81,7 +70,7 @@ export default function DocumentsPage() {
                   ? "bg-green-500 text-white"
                   : "bg-gray-200/30"
               }`}
-              onClick={() => handleSubcategorySelect(subcategory)}
+              onClick={() => setSelectedSubcategory(subcategory)}
             >
               {subcategory}
             </button>
@@ -89,7 +78,6 @@ export default function DocumentsPage() {
         </div>
       )}
 
-      {/* Список документів */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredDocuments.map((doc) => (
           <div key={doc._id} className="p-4 bg-white/10 shadow-md rounded-md">
