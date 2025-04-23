@@ -13,16 +13,43 @@ export default function AddDocumentModal({ isOpen, onClose }) {
     filePath: "",
     category: "",
   });
+  const [file, setFile] = useState(null);
 
   const handleSubmit = async () => {
+    if (!form.title || !form.category || (!form.filePath && !file)) {
+      alert("Будь ласка, заповніть усі обов'язкові поля");
+      return;
+    }
+    let filePath = form.filePath;
+
+    if (file) {
+      const fd = new FormData();
+      fd.append("file", file);
+
+      const uploadRes = await fetch("/api/documents/upload", {
+        method: "POST",
+        body: fd,
+      });
+
+      const uploadData = await uploadRes.json();
+
+      if (uploadRes.ok) {
+        filePath = uploadData.filePath;
+      } else {
+        console.error("❌ Помилка завантаження файлу:", uploadData.error);
+        return;
+      }
+    }
+    console.log({ ...form, filePath });
     const res = await fetch("/api/documents", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, filePath }),
     });
+
     if (res.ok) {
       setForm({ title: "", description: "", filePath: "", category: "" });
-
+      setFile(null);
       await queryClient.invalidateQueries({ queryKey: ["documents"] });
       onClose();
     } else {
@@ -33,11 +60,8 @@ export default function AddDocumentModal({ isOpen, onClose }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: "modal",
   });
-
   const style = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
+    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
     : undefined;
 
   return (
@@ -62,13 +86,6 @@ export default function AddDocumentModal({ isOpen, onClose }) {
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             className="w-full border rounded p-2"
           />
-          <input
-            type="text"
-            placeholder="Категорія"
-            value={form.category}
-            onChange={(e) => setForm({ ...form, category: e.target.value })}
-            className="w-full border rounded p-2"
-          />
           <textarea
             placeholder="Опис"
             value={form.description}
@@ -77,9 +94,15 @@ export default function AddDocumentModal({ isOpen, onClose }) {
           />
           <input
             type="text"
-            placeholder="Посилання на файл"
-            value={form.filePath}
-            onChange={(e) => setForm({ ...form, filePath: e.target.value })}
+            placeholder="Категорія"
+            value={form.category}
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
+            className="w-full border rounded p-2"
+          />
+
+          <input
+            type="file"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
             className="w-full border rounded p-2"
           />
 
