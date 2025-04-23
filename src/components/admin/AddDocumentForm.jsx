@@ -7,7 +7,7 @@ export default function AddDocumentForm({
   onCancel,
 }) {
   return (
-    <div className="p-4 border border-gray-300 mb-4">
+    <div className="bg-gray-700 p-4 border border-gray-300 mb-4">
       <h2 className="text-lg font-bold mb-2">Новий документ</h2>
 
       {/* Поле для назви документа */}

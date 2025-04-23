@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { connectToDatabase } from "@/utils/db";
 import Document from "@/models/Document";
+import mongoose from "mongoose";
 
 export const GET = async (req) => {
   const session = await auth();
@@ -25,12 +26,13 @@ export const POST = async (req) => {
   }
 
   await connectToDatabase();
+  console.log("📤 session.user =", session.user);
 
   try {
     const data = await req.json();
     const document = new Document({
       ...data,
-      uploadedBy: session.user.id,
+      uploadedBy: new mongoose.Types.ObjectId(session.user.id),
     });
     await document.save();
 

@@ -1,100 +1,35 @@
 "use client";
-import { useState, useEffect } from "react";
-import fetchWithAuth from "@/utils/fetchWithAuth";
-import DocumentsTable from "@/components/admin/DocumentsTable";
-import AddDocumentForm from "@/components/admin/AddDocumentForm";
 
-export default function AdminDocuments() {
-  const [documents, setDocuments] = useState([]);
-  const [isAdding, setIsAdding] = useState(false);
-  const [newDocument, setNewDocument] = useState({
-    title: "",
-    description: "",
-    category: "",
-    subcategory: "",
-    isArchived: false,
-    shareholdersOnly: false,
-  });
+import { useState } from "react";
+import { useDocuments } from "@/hooks/useDocuments";
+import DocumentsTable from "@/components/admin/documents/DocumentsTable";
+import AddDocumentModal from "@/components/admin/documents/AddDocumentModal";
 
-  const fetchDocuments = async () => {
-    const data = await fetchWithAuth("/api/documents");
-    if (data) setDocuments(data);
-  };
+export default function DocumentsPage() {
+  const { data: documents = [], isLoading, error } = useDocuments();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // useEffect(() => {
-  //   setNewDocument((prev) => ({ ...prev, uploadedBy: user?._id }));
-  // }, [user]);
-
-  useEffect(() => {
-    const fetchData = async () => await fetchDocuments();
-    fetchData();
-  }, []);
-
-  const handleUpdate = async (id, field, value) => {
-    console.log(`🔄 Оновлення документа ${id}: ${field} ->`, value);
-    const response = await fetchWithAuth(`/api/documents/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify({ [field]: value }),
-    });
-
-    if (response) {
-      console.log("✅ Документ успішно оновлено!");
-      fetchDocuments();
-    } else {
-      console.error("❌ Помилка оновлення документа!");
-    }
-  };
-
-  const handleAddDocument = async () => {
-    console.log("📤 Відправка нового документа:", newDocument);
-
-    const response = await fetchWithAuth("/api/documents", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newDocument),
-    });
-
-    if (response?.error) {
-      console.error("❌ Помилка при додаванні:", response.error);
-      return;
-    }
-
-    console.log("✅ Документ додано:", response.message);
-    fetchDocuments();
-    setIsAdding(false);
-    setNewDocument({
-      title: "",
-      description: "",
-      category: "",
-      subcategory: "",
-      isArchived: false,
-      shareholdersOnly: false,
-    });
-  };
+  if (isLoading) return <p>Завантаження...</p>;
+  if (error) return <p>❌ Помилка: {error.message}</p>;
 
   return (
-    <div className="p-4 max-w-90vw mx-auto">
-      <h1 className="text-2xl font-bold text-center mb-6">
-        Адміністрування документів
-      </h1>
+    <div className="p-4 max-w-6xl mx-auto space-y-4">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Документи</h1>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          ➕ Додати документ
+        </button>
+      </div>
 
-      <button
-        onClick={() => setIsAdding(true)}
-        className="mb-4 bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        Додати документ
-      </button>
+      <DocumentsTable documents={documents} />
 
-      {isAdding && (
-        <AddDocumentForm
-          newDocument={newDocument}
-          setNewDocument={setNewDocument}
-          onSave={handleAddDocument}
-          onCancel={() => setIsAdding(false)}
-        />
-      )}
-
-      <DocumentsTable documents={documents} onUpdate={handleUpdate} />
+      <AddDocumentModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

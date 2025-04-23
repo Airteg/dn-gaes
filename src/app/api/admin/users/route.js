@@ -51,7 +51,7 @@ export const GET = async (req) => {
     position: user.position,
     placeOfWork: user.placeOfWork,
   }));
-  console.log("🔍 Серіалізовані:", serializedUsers);
+  // console.log("🔍 Серіалізовані:", serializedUsers);
 
   // ✅ Повернення результату:
   // Повертає JSON з масивом користувачів та загальною кількістю.

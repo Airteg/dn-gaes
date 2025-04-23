@@ -40,3 +40,31 @@ export const POST = async (req) => {
     return NextResponse.json({ error: "Помилка сервера" }, { status: 500 });
   }
 };
+
+export const PUT = async (req, { params }) => {
+  const session = await auth();
+  if (!session?.user || !["admin", "moderator"].includes(session.user.role)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  await connectToDatabase();
+
+  try {
+    const id = params.id;
+    const data = await req.json();
+
+    const result = await Document.findByIdAndUpdate(id, data, { new: true });
+
+    if (!result) {
+      return NextResponse.json(
+        { error: "Документ не знайдено" },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json({ message: "Документ оновлено" });
+  } catch (error) {
+    console.error("❌ Помилка оновлення документа:", error);
+    return NextResponse.json({ error: "Помилка сервера" }, { status: 500 });
+  }
+};

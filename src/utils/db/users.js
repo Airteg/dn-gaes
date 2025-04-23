@@ -37,7 +37,7 @@ export const getUsers = async ({
 
   const total = await User.countDocuments(query);
   // console.log("📊 Знайдені користувачі:", users);
-  console.log("📊 Загальна кількість:", total);
+  console.log("📊 Загальна кількість користувачів:", total);
 
   return { users, total };
 };
