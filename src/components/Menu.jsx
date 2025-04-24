@@ -9,19 +9,19 @@ export default async function Menu() {
   const user = session?.user;
 
   return (
-    <nav className="bg-[var(--nav-bg)] text-[var(--foreground)] p-4">
+    <nav className="bg-[var(--nav-bg)] p-4">
       {/* MobileMenu — рендериться завжди, але показує себе сам */}
       <MobileMenu user={user} />
-      <div className="hidden xl:flex w-full  mx-auto items-center justify-between">
+      <div className="hidden xl:flex w-full max-w  mx-auto items-center justify-between">
         {/* Ліво: Заголовок */}
         <div className="text-sm xl:text-base basis-1/4 2xl:text-lg font-bold">
-          <h5>Нижньодністровська ГЕС</h5>
+          <h4 className="text-[var(--t-color)] ">Нижньодністровська ГЕС</h4>
         </div>
 
         {/* Центр: Навігація */}
-        <div className="flex grow-1 justify-around">
+        <div className="pl-10 flex grow-1 justify-around  text-[var(--m-color)]">
           <NavLink href="/">Головна</NavLink>
-          <NavLink href="/news">Новини</NavLink>
+          <NavLink href="/news">Про нас</NavLink>
           <NavLink href="/documents">Документи</NavLink>
           <NavLink href="/contacts">Контакти</NavLink>
           <NavLink href="/admin">Адміністрування</NavLink>

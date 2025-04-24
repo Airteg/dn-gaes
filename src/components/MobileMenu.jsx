@@ -19,7 +19,7 @@ export default function MobileMenu({ user }) {
 
   if (!open && !closing) {
     return (
-      <div className="flex items-center justify-between p-2 xl:hidden">
+      <div className="flex items-center justify-between  xl:hidden">
         <button
           onClick={() => setOpen(true)}
           className="block xl:hidden ml-4"
@@ -39,8 +39,8 @@ export default function MobileMenu({ user }) {
             />
           </svg>
         </button>
-        <div className="text-sm xl:text-base 2xl:text-lg mr-2 font-bold">
-          ПрAAAАТ Нижньодністровська ГЕС
+        <div className="grow-1 px-4 text-sm xl:text-base 2xl:text-lg mr-2 font-bold">
+          Нижньодністровська ГЕС
         </div>
         <ThemeToggleButton />
       </div>

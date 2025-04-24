@@ -1,4 +1,5 @@
 import React from "react";
+import DniesterSlider from "./DniesterSlider.jsx";
 
 const BackgroundVideo = () => {
   return (
@@ -7,9 +8,11 @@ const BackgroundVideo = () => {
         <source src="/video/mp4/video1.mp4" type="video/mp4" />
         Ваш браузер не підтримує відео.
       </video>
-      <div className="overlay">
+      <div className="absolute inset-0 mix-blend-multiply bg-[var(--video-filter)]" />
+      {/* <div className="overlay">
         <h1 className="title">Нижньодністровська ГЕС</h1>
-      </div>
+      </div> */}
+      <DniesterSlider />
     </div>
   );
 };
