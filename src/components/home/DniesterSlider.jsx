@@ -51,7 +51,7 @@ export default function DniesterSlider() {
             key="main-title"
             initial={{ x: "-100%", opacity: 0, scale: 1 }}
             animate={{ x: 0, opacity: 1 }}
-            exit={{ x: "-40vw", y: "-40vh", scale: 0.6, opacity: 0.8 }}
+            exit={{ x: "-42vw", y: "-44vh", scale: 0.6, opacity: 0.0 }}
             transition={{ duration: 1.2 }}
             className="absolute text-4xl font-bold title"
             style={{ color: "var(--t-color)" }}
