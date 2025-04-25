@@ -26,3 +26,7 @@ h5 {
 h6 {
   font-size: 1.125rem; /* 18px */
 }
+p,
+span {
+  @apply text-[14px] sm:text-base;
+}
