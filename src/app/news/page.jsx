@@ -2,7 +2,7 @@ import Image from "next/image.js";
 
 export default function AboutPage() {
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10 text-[var(--p-color)]">
+    <div className="max-w-7xl mx-auto px-4 py-10 text-[var(--p-color)]">
       <div className="relative">
         <h1 className="text-4xl font-bold text-[var(--t-color)] mb-6">
           🌊 Народжена з Дністра: історія Дністровської ГЕС

@@ -27,7 +27,7 @@ html {
   --link-color-active: #f1f5f9;
   --link-hover: #0f172a;
   --nav-bg: rgb(241, 245, 249);
-  --menu-bg: linear-gradient(rgba(248, 250, 252, 0.95), rgba(239, 246, 255, 0.95)); /* gray-50 → blue-50 */
+  --menu-bg: linear-gradient(rgba(248, 250, 252, 0.95), rgba(239, 246, 255, 0.95));
   --modal-overlay: rgba(0, 0, 0, 0.5);
   --border-color: #d1d5db; /* gray-300 */
   --t-color: rgb(0, 0, 255); /* Title blue-800 */
@@ -38,6 +38,7 @@ html {
   /* --video-filter: rgba(147, 197, 253, 0.4);*/
   --video-filter: rgba(192, 215, 255, 0.959);
   --brightness: 0.9;
+  --bgg: rgb(239, 247, 255); /* blue-50 */
 }
 
 html.dark {
@@ -118,9 +119,7 @@ nav {
 /* Анімація */
 .title {
   @apply text-5xl font-bold;
-  text-shadow:
-    2px 2px 10px rgba(0, 0, 0, 0.8),
-    -1px -1px 10px rgba(255, 255, 255, 0.8);
+  text-shadow: 1px 1px 3px rgba(30, 58, 138, 0.7);
   color: var(--tl-color);
 }
 @keyframes slideDown {
