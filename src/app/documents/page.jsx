@@ -1,13 +1,30 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useDocuments } from "@/hooks/useDocuments";
 
 export default function DocumentsPage() {
   const { data: documents = [], isLoading, error } = useDocuments();
-
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  const [showScrollButtons, setShowScrollButtons] = useState(false);
+  const scrollRef = useRef();
+  const scrollLeft = () => {
+    scrollRef.current.scrollBy({ left: -200, behavior: "smooth" });
+  };
+  const scrollRight = () => {
+    scrollRef.current.scrollBy({ left: 200, behavior: "smooth" });
+  };
+  useEffect(() => {
+    const checkScroll = () => {
+      if (!scrollRef.current) return; // Перевірка, чи існує scrollRef.current
+      const { scrollWidth, clientWidth } = scrollRef.current;
+      setShowScrollButtons(scrollWidth > clientWidth);
+    };
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+    return () => window.removeEventListener("resize", checkScroll);
+  }, []);
 
   const categories = useMemo(
     () => [...new Set(documents.map((doc) => doc.category))],
@@ -39,55 +56,79 @@ export default function DocumentsPage() {
 
   return (
     <div className="flex items-start justify-around">
-      <div className="hidden xl:flex basis-1/8"></div>
-      <div className="grow-1  max-[1279px]:ml-4">
+      <div className="basis-[1280px] shrink max-[1279px]:mx-4 border border-amber-600">
         <h1 className="text-2xl font-bold text-left mb-6">Документи</h1>
         <h6 className="text-sm text-left mb-4">
-          Отримайте доступ до нашої повної колекції документів
+          <span>Отримайте доступ до нашої повної колекції документів</span>
         </h6>
 
-        {/* Лінійка категорій */}
-        <div className="flex overflow-x-auto overflow-y-visible bg-[var(--foreground)]/5 space-x-2  px-2 py-1">
-          {categories.map((category) => (
+        {/* Контейнер для категорій із кнопками */}
+        <div className="relative w-[80vw] max-w-[1280px] mx-auto">
+          {/* Кнопка зліва */}
+          {showScrollButtons && (
             <button
-              key={category}
-              className={`whitespace-nowrap px-4 py-2 rounded-md transition ${
-                selectedCategory === category
-                  ? "button-gradient shadow-sm text-[var(--link-color-active)] scale-[1.1]"
-                  : "bg-transparent text-[var(--link-color)] hover:text-[var(--link-hover)] hover:underline"
-              }`}
-              onClick={() => {
-                setSelectedCategory(category);
-                setSelectedSubcategory(null);
-              }}
+              onClick={scrollLeft}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800/80 text-[var(--p-color)] px-2 py-1 rounded-full hover:bg-gray-700"
             >
-              {category}
+              ◀
             </button>
-          ))}
+          )}
+          {/* Контейнер із категоріями */}
+          <div
+            ref={scrollRef}
+            className="w-full overflow-x-auto whitespace-nowrap scrollbar-hidden bg-[var(--foreground)]/5 space-x-2 px-6 py-1"
+          >
+            <div className="inline-flex gap-2 px-1">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  className={`whitespace-nowrap px-4 py-2 rounded-md transition ${
+                    selectedCategory === category
+                      ? "button-gradient shadow-sm text-[var(--link-color-active)] scale-[1.1]"
+                      : "bg-transparent text-[var(--link-color)] hover:text-[var(--link-hover)] hover:underline"
+                  }`}
+                  onClick={() => {
+                    setSelectedCategory(category);
+                    setSelectedSubcategory(null);
+                  }}
+                >
+                  <span>{category}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Кнопка справа */}
+          {showScrollButtons && (
+            <button
+              onClick={scrollRight}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800/80 text-white px-2 py-1 rounded-full hover:bg-gray-700"
+            >
+              ▶
+            </button>
+          )}
         </div>
 
-        {/* Лінійка/стовпчик субкатегорій */}
+        {/* Решта коду без змін */}
         <div>
           {subcategories.length > 0 && (
-            <div className="flex overflow-x-auto space-x-2 border-b py-2 mt-4">
+            <div className="flex overflow-x-auto space-x-2 border-b p-2 mt-4">
               {subcategories.map((subcategory) => (
                 <button
                   key={subcategory}
-                  className={`px-3 py-1 rounded-md transition ${
+                  className={`whitespace-nowrap px-4 py-2 rounded-md transition ${
                     selectedSubcategory === subcategory
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-200/30"
+                      ? "button-gradient shadow-sm text-[var(--link-color-active)] scale-[1.1]"
+                      : "bg-transparent text-[var(--link-color)] hover:text-[var(--link-hover)] hover:underline"
                   }`}
                   onClick={() => setSelectedSubcategory(subcategory)}
                 >
-                  {subcategory}
+                  <span>{subcategory}</span>
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        {/* Список документів */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredDocuments.map((doc) => (
             <div key={doc._id} className="p-4 bg-white/10 shadow-md rounded-md">
@@ -105,7 +146,6 @@ export default function DocumentsPage() {
           ))}
         </div>
       </div>
-      <div className="hidden xl:flex basis-1/8"></div>
     </div>
   );
 }

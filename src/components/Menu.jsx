@@ -20,11 +20,21 @@ export default async function Menu() {
 
         {/* Центр: Навігація */}
         <div className="pl-10 flex grow-1 justify-around  text-[var(--m-color)]">
-          <NavLink href="/">Головна</NavLink>
-          <NavLink href="/news">Про нас</NavLink>
-          <NavLink href="/documents">Документи</NavLink>
-          <NavLink href="/contacts">Контакти</NavLink>
-          <NavLink href="/admin">Адміністрування</NavLink>
+          <NavLink href="/">
+            <span>Головна</span>{" "}
+          </NavLink>
+          <NavLink href="/news">
+            <span> Про нас</span>
+          </NavLink>
+          <NavLink href="/documents">
+            <span> Документи</span>
+          </NavLink>
+          <NavLink href="/contacts">
+            <span> Контакти</span>
+          </NavLink>
+          <NavLink href="/admin">
+            <span> Адміністрування</span>
+          </NavLink>
         </div>
 
         {/* Право: Юзер і Тема */}

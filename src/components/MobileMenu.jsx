@@ -40,7 +40,7 @@ export default function MobileMenu({ user }) {
           </svg>
         </button>
         <div className="grow-1 px-4 text-sm xl:text-base 2xl:text-lg mr-2 font-bold">
-          Нижньодністровська ГЕС
+          <h4 className="text-[var(--t-color)]">Нижньодністровська ГЕС</h4>
         </div>
         <ThemeToggleButton />
       </div>
@@ -57,7 +57,7 @@ export default function MobileMenu({ user }) {
     >
       <div className="flex justify-start items-center border-b border-[var(--foreground)] pb-4">
         <div className="text-sm xl:text-base 2xl:text-lg mr-2 font-bold">
-          ПрАТ Нижньодністровська ГЕС
+          <h4 className="text-[var(--t-color)]">Нижньодністровська ГЕС</h4>
         </div>
       </div>
 
@@ -65,16 +65,16 @@ export default function MobileMenu({ user }) {
 
       <div className="flex flex-col gap-2 border-t border-[var(--foreground)]">
         <NavLink href="/" onClick={handleClose}>
-          Головна
+          <span>Головна</span>
         </NavLink>
         <NavLink href="/news" onClick={handleClose}>
-          Новини
+          <span>Про нас</span>
         </NavLink>
         <NavLink href="/documents" onClick={handleClose}>
-          Документи
+          <span>Документи</span>
         </NavLink>
         <NavLink href="/contacts" onClick={handleClose}>
-          Контакти
+          <span>Контакти</span>
         </NavLink>
       </div>
 

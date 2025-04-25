@@ -210,3 +210,14 @@ html.dark .title {
   background-position: 0% 50%;
   animation: gradientSlide 5s ease-in-out forwards;
 }
+.scrollbar-hidden {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE & Edge */
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+.scroll-btn {
+  @apply z-10 bg-white/80 text-black px-2 py-1 rounded shadow;
+}

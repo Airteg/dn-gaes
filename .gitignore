@@ -48,3 +48,4 @@ next-env.d.ts
 /public/storage/metadataDoc.json
 
 /public/documents/
+src/components/Temp/index.html
