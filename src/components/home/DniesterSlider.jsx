@@ -56,7 +56,11 @@ export default function DniesterSlider() {
             className="absolute text-4xl font-bold title"
             style={{ color: "var(--t-color)" }}
           >
-            Нижньодністровська ГЕС
+            <div className="flex bg-transparent max-w-[800px] min-w-[360px] px-6 py-4">
+              <span className="title" style={{ textAlign: "center" }}>
+                Нижньодністровська ГЕС
+              </span>
+            </div>
           </motion.h1>
         ) : (
           <motion.div
@@ -68,7 +72,7 @@ export default function DniesterSlider() {
             className="absolute w-full h-full flex items-center justify-center"
           >
             <div
-              className="bg-transparent max-w-[600px] min-w-[420px] px-6 py-4"
+              className="bg-transparent max-w-[600px] min-w-[360px] px-6 py-4"
               style={{ color: "var(--p-color)" }}
             >
               <h1

@@ -1,4 +1,4 @@
-import BackgroundVideo from "@/components/home/BackgroundVideo.js";
+import BackgroundVideo from "@/components/home/BackgroundVideo";
 
 const HomePage = () => {
   return (
