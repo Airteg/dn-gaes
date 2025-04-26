@@ -66,7 +66,7 @@ export default function DocumentsPage() {
           selectedSubcategory={selectedSubcategory}
           onSubcategorySelect={setSelectedSubcategory}
           documents={filteredDocuments}
-          className="border-2 border-green-600"
+          className="flex flex-col lg:flex-row w-[80vw] max-w-[1280px] mx-auto gap-4 border-2 border-green-600"
         />
       </div>
     </div>
