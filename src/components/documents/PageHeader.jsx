@@ -1,17 +1,12 @@
-const CategoryButton = ({ category, isSelected, onClick, className = "" }) => {
+const PageHeader = ({ title, subtitle, className = "" }) => {
   return (
-    <button
-      className={`whitespace-nowrap px-4 py-2 rounded-md transition-all duration-300 ${
-        isSelected
-          ? "button-gradient shadow-md text-[var(--link-color-active)] scale-[1.2]"
-          : "bg-transparent text-[var(--link-color)] hover:text-[var(--link-hover)] hover:underline"
-      } ${className}`}
-      onClick={onClick}
-      aria-pressed={isSelected}
-    >
-      <span>{category}</span>
-    </button>
+    <div className={className}>
+      <h1 className="text-2xl font-bold text-left mb-6">{title}</h1>
+      <h6 className="text-sm text-left mb-4">
+        <span>{subtitle}</span>
+      </h6>
+    </div>
   );
 };
 
-export default CategoryButton;
+export default PageHeader;

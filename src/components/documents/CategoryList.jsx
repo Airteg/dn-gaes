@@ -32,7 +32,7 @@ const CategoryList = ({
   };
 
   return (
-    <div className={`relative w-[80vw] max-w-[1280px] mx-auto ${className}`}>
+    <div className={`relative w-[90vw] max-w-[1280px] mx-auto ${className}`}>
       {showScrollButtons && (
         <ScrollButton direction="left" onClick={scrollLeft} />
       )}
