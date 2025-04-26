@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useDocuments } from "@/hooks/useDocuments";
+import ScrollButton from "@/components/documents/ScrollButton.jsx";
 
 export default function DocumentsPage() {
   const { data: documents = [], isLoading, error } = useDocuments();
@@ -55,39 +56,23 @@ export default function DocumentsPage() {
   if (error) return <p>❌ Помилка: {error.message}</p>;
 
   return (
-    <div className="flex items-start justify-around border border-lime-600">
-      <div className="basis-[1280px] shrink max-[1279px]:mx-4 border border-amber-600">
+    <div className="flex items-start justify-center basis-[1280px] shrink max-[1279px]:mx-4 border border-lime-600">
+      <div className=" border border-amber-600">
         <h1 className="text-2xl font-bold text-left mb-6">Документи</h1>
         <h6 className="text-sm text-left mb-4">
           <span>Отримайте доступ до нашої повної колекції документів</span>
         </h6>
 
         {/* Контейнер для категорій із кнопками */}
-        <div className="vvv relative w-[80vw] max-w-[1280px] mx-auto border border-orange-600">
+        <div className="relative  w-[80vw] max-w-[1280px] mx-auto border border-orange-600">
           {/* Кнопка зліва */}
           {showScrollButtons && (
-            <button
-              onClick={scrollLeft}
-              className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 z-10 px-1 transition-all duration-300 bg-[rgba(var(--frground),0.1)] hover:bg-[rgba(var(--frground),0.2)]"
-              aria-label="Прокрутити категорії вліво"
-            >
-              <svg
-                width="10.5"
-                height="40"
-                viewBox="0 0 2 8"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="0.2"
-                className="text-[var(--t-color)]"
-              >
-                <path d="M 2 8 L 0 4 L 2 0" />
-              </svg>
-            </button>
+            <ScrollButton direction="left" onClick={scrollLeft} />
           )}
           {/* Контейнер із категоріями */}
           <div
             ref={scrollRef}
-            className="w-full overflow-x-auto whitespace-nowrap scrollbar-hidden bg-[var(--foreground)]/5 space-x-2 px-6 py-1"
+            className="w-full overflow-x-auto whitespace-nowrap scrollbar-hidden bg-(--foreground)/4 space-x-2 px-6 py-1"
           >
             <div className="inline-flex gap-2 px-1">
               {categories.map((category) => (
@@ -110,28 +95,12 @@ export default function DocumentsPage() {
           </div>
           {/* Кнопка справа */}
           {showScrollButtons && (
-            <button
-              onClick={scrollRight}
-              className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 z-10 transition-all duration-300 px-1 bg-[rgba(var(--frground),0.1)] hover:bg-[rgba(var(--frground),0.2)]"
-              aria-label="Прокрутити категорії вправо"
-            >
-              <svg
-                width="10.5"
-                height="40"
-                viewBox="0 0 2 8"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="0.2"
-                className="text-[var(--t-color)]"
-              >
-                <path d="M 0 8 L 2 4 L 0 0" />
-              </svg>
-            </button>
+            <ScrollButton direction="right" onClick={scrollRight} />
           )}
         </div>
 
-        {/* Решта коду без змін */}
-        <div>
+        {/* subcategories */}
+        <div className="relative  w-[80vw] max-w-[1280px] mx-auto border-2 border-green-600">
           {subcategories.length > 0 && (
             <div className="flex overflow-x-auto space-x-2 border-b p-2 mt-4">
               {subcategories.map((subcategory) => (

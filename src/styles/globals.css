@@ -23,7 +23,6 @@ html {
 
   --background: rgb(248, 250, 252); /* Додаємо для MobileMenu */
   --foreground: rgb(15, 23, 42);
-  --frground: 15, 23, 42;
   --link-color: #1e293b;
   --link-color-active: #f1f5f9;
   --link-hover: #0f172a;
@@ -46,7 +45,6 @@ html.dark {
   --background-image: linear-gradient(to bottom right, #1e293b, #334155);
   --background: #0f172a;
   --foreground: rgb(241, 245, 249);
-  --frground: 241, 245, 249;
   --link-color: #f1f5f9;
   --link-color-active: #f1f5f9;
   --link-hover: #e2e8f0;
