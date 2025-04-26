@@ -55,7 +55,7 @@ export default function DocumentsPage() {
   if (error) return <p>❌ Помилка: {error.message}</p>;
 
   return (
-    <div className="flex items-start justify-around">
+    <div className="flex items-start justify-around border border-lime-600">
       <div className="basis-[1280px] shrink max-[1279px]:mx-4 border border-amber-600">
         <h1 className="text-2xl font-bold text-left mb-6">Документи</h1>
         <h6 className="text-sm text-left mb-4">
@@ -63,14 +63,25 @@ export default function DocumentsPage() {
         </h6>
 
         {/* Контейнер для категорій із кнопками */}
-        <div className="relative w-[80vw] max-w-[1280px] mx-auto">
+        <div className="vvv relative w-[80vw] max-w-[1280px] mx-auto border border-orange-600">
           {/* Кнопка зліва */}
           {showScrollButtons && (
             <button
               onClick={scrollLeft}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800/80 text-[var(--p-color)] px-2 py-1 rounded-full hover:bg-gray-700"
+              className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 z-10 px-1 transition-all duration-300 bg-[rgba(var(--frground),0.1)] hover:bg-[rgba(var(--frground),0.2)]"
+              aria-label="Прокрутити категорії вліво"
             >
-              ◀
+              <svg
+                width="10.5"
+                height="40"
+                viewBox="0 0 2 8"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="0.2"
+                className="text-[var(--t-color)]"
+              >
+                <path d="M 2 8 L 0 4 L 2 0" />
+              </svg>
             </button>
           )}
           {/* Контейнер із категоріями */}
@@ -101,9 +112,20 @@ export default function DocumentsPage() {
           {showScrollButtons && (
             <button
               onClick={scrollRight}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800/80 text-white px-2 py-1 rounded-full hover:bg-gray-700"
+              className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 z-10 transition-all duration-300 px-1 bg-[rgba(var(--frground),0.1)] hover:bg-[rgba(var(--frground),0.2)]"
+              aria-label="Прокрутити категорії вправо"
             >
-              ▶
+              <svg
+                width="10.5"
+                height="40"
+                viewBox="0 0 2 8"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="0.2"
+                className="text-[var(--t-color)]"
+              >
+                <path d="M 0 8 L 2 4 L 0 0" />
+              </svg>
             </button>
           )}
         </div>
