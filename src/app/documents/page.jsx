@@ -5,8 +5,8 @@ import { useDocuments } from "@/hooks/useDocuments";
 import PageHeader from "@/components/documents/PageHeader";
 import CategoryList from "@/components/documents/CategoryList";
 import ContentWrapper from "@/components/documents/ContentWrapper";
-import Section from "@/components/documents/Section.jsx";
-import DocumentsWrapper from "@/components/documents/DocumentsWrapper.jsx";
+import Section from "@/components/documents/Section";
+import DocumentsWrapper from "@/components/documents/DocumentsWrapper";
 
 export default function DocumentsPage() {
   const { data: documents = [], isLoading, error } = useDocuments();
@@ -19,18 +19,20 @@ export default function DocumentsPage() {
   );
 
   const subcategories = useMemo(() => {
-    return [
+    const subs = [
       ...new Set(
         documents
           .filter((doc) => doc.category === selectedCategory && doc.subcategory)
           .map((doc) => doc.subcategory),
       ),
     ];
+    return ["Всі документи", ...subs];
   }, [selectedCategory, documents]);
 
   const filteredDocuments = useMemo(() => {
     return documents.filter((doc) => {
       if (doc.category !== selectedCategory) return false;
+      if (selectedSubcategory === "Всі документи") return true;
       if (!selectedSubcategory && doc.subcategory) return false;
       if (selectedSubcategory && doc.subcategory !== selectedSubcategory)
         return false;
@@ -62,13 +64,12 @@ export default function DocumentsPage() {
             setSelectedSubcategory(null);
           }}
         />
-
         <ContentWrapper
           subcategories={subcategories}
           selectedSubcategory={selectedSubcategory}
           onSubcategorySelect={setSelectedSubcategory}
           documents={filteredDocuments}
-          className="w-full flex flex-col lg:flex-row mx-auto p-2 gap-4 border-2 border-green-600"
+          className="w-full flex flex-col lg:flex-row mx-auto p-2 gap-4"
         />
       </DocumentsWrapper>
     </Section>

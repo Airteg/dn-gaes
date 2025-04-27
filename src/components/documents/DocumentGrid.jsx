@@ -2,7 +2,7 @@ import DocumentCard from "./DocumentCard";
 
 const DocumentGrid = ({ documents, className = "" }) => {
   return (
-    <div className={`${className}`}>
+    <div className={`flex flex-wrap ${className}`}>
       {documents.map((doc) => (
         <DocumentCard
           key={doc._id}

@@ -20,19 +20,19 @@ const ContentWrapper = ({
 
   return (
     <div
-      className={`flex flex-col lg:flex-row w-[80vw] max-w-[1280px] mx-auto gap-4 ${className}`}
+      className={`flex flex-col lg:flex-row w-[80vw] max-w-[1280px] mx-auto gap-4 pt-8 ${className}`}
     >
       {hasSubcategories && (
         <SubcategoryList
           subcategories={subcategories}
           selectedSubcategory={selectedSubcategory}
           onSubcategorySelect={onSubcategorySelect}
-          className="lg:w-1/3"
+          className="lg:w-1/4"
         />
       )}
       <DocumentGrid
         documents={documents}
-        className={hasSubcategories ? "lg:w-2/3" : "lg:w-full"}
+        className={hasSubcategories ? "lg:w-3/4" : "lg:w-full"}
       />
     </div>
   );

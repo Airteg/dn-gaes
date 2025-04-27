@@ -1,8 +1,8 @@
 const DocumentCard = ({ title, description, filePath, className = "" }) => {
   return (
-    <div className={`document-card h-full ${className}`}>
+    <div className={`document-card w-1/3 aspect-[5/3] ${className}`}>
       <div
-        className={`rounded-xl border bg-card text-card-foreground h-full overflow-hidden cursor-pointer bg-gradient-to-br from-blue-50 to-teal-50 border-blue-200 hover:border-blue-400 transition-all duration-300 shadow-sm hover:shadow-md`}
+        className={`rounded-xl border bg-card m-1 text-card-foreground h-full overflow-hidden cursor-pointer bg-gradient-to-br from-blue-50 to-teal-50 border-blue-200 hover:border-blue-400 transition-all duration-300 shadow-sm hover:shadow-md hover:animate-scale-bounce`}
       >
         <div className="p-5 h-full flex flex-col">
           <h3 className="text-lg font-semibold">{title}</h3>

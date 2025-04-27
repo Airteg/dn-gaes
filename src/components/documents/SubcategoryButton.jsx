@@ -6,15 +6,15 @@ const SubcategoryButton = ({
 }) => {
   return (
     <button
-      className={`whitespace-nowrap px-4 py-2 rounded-md transition-all duration-300 ${
+      className={`text-left whitespace-nowrap px-4 py-2 rounded-md cursor-pointer transition-all duration-300 ${
         isSelected
-          ? "button-gradient shadow-sm text-[var(--link-color-active)] scale-[1.1]"
-          : "bg-transparent text-[var(--link-color)] hover:text-[var(--link-hover)] hover:underline"
+          ? "font-bold text-[var(--link-color)] border-l-4"
+          : "bg-transparent text-[var(--link-color)] hover:text-[var(--link-hover)] hover:bg-gray-500/10"
       } ${className}`}
       onClick={onClick}
       aria-pressed={isSelected}
     >
-      <span>{subcategory}</span>
+      <span className="text-left">{subcategory}</span>
     </button>
   );
 };
