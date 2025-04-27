@@ -13,14 +13,22 @@ const CategoryList = ({
   const [showScrollButtons, setShowScrollButtons] = useState(false);
 
   useEffect(() => {
-    const checkScroll = () => {
-      if (!scrollRef.current) return;
+    if (!scrollRef.current) return;
+
+    const observer = new ResizeObserver(() => {
       const { scrollWidth, clientWidth } = scrollRef.current;
       setShowScrollButtons(scrollWidth > clientWidth);
+    });
+
+    observer.observe(scrollRef.current);
+
+    // Після монтування треба одразу викликати перевірку:
+    const { scrollWidth, clientWidth } = scrollRef.current;
+    setShowScrollButtons(scrollWidth > clientWidth);
+
+    return () => {
+      observer.disconnect();
     };
-    checkScroll();
-    window.addEventListener("resize", checkScroll);
-    return () => window.removeEventListener("resize", checkScroll);
   }, [categories]);
 
   const scrollLeft = () => {

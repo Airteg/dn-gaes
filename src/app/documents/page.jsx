@@ -5,6 +5,8 @@ import { useDocuments } from "@/hooks/useDocuments";
 import PageHeader from "@/components/documents/PageHeader";
 import CategoryList from "@/components/documents/CategoryList";
 import ContentWrapper from "@/components/documents/ContentWrapper";
+import Section from "@/components/documents/Section.jsx";
+import DocumentsWrapper from "@/components/documents/DocumentsWrapper.jsx";
 
 export default function DocumentsPage() {
   const { data: documents = [], isLoading, error } = useDocuments();
@@ -46,8 +48,8 @@ export default function DocumentsPage() {
   if (error) return <p>❌ Помилка: {error.message}</p>;
 
   return (
-    <div className="flex items-start justify-center basis-[1280px] shrink max-[1279px]:mx-4 border border-lime-600">
-      <div className="border border-amber-600">
+    <Section>
+      <DocumentsWrapper>
         <PageHeader
           title="Документи"
           subtitle="Отримайте доступ до нашої повної колекції документів"
@@ -59,16 +61,16 @@ export default function DocumentsPage() {
             setSelectedCategory(category);
             setSelectedSubcategory(null);
           }}
-          className="border border-orange-600"
         />
+
         <ContentWrapper
           subcategories={subcategories}
           selectedSubcategory={selectedSubcategory}
           onSubcategorySelect={setSelectedSubcategory}
           documents={filteredDocuments}
-          className="flex flex-col lg:flex-row w-[80vw] max-w-[1280px] mx-auto gap-4 border-2 border-green-600"
+          className="w-full flex flex-col lg:flex-row mx-auto p-2 gap-4 border-2 border-green-600"
         />
-      </div>
-    </div>
+      </DocumentsWrapper>
+    </Section>
   );
 }
