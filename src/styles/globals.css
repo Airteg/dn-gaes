@@ -40,6 +40,9 @@ html {
   --video-filter: rgba(192, 215, 255, 0.959);
   --brightness: 0.9;
   --bgg: rgb(239, 247, 255); /* blue-50 */
+  --card-bg: linear-gradient(to bottom right, #eff6ff, #e6fffa); /* from-blue-50 to-teal-50 */
+  --card-border: #bfdbfe; /* blue-200 */
+  --card-border-hover: #60a5fa; /* blue-400 */
 }
 
 html.dark {
@@ -60,6 +63,9 @@ html.dark {
   --button-bg: linear-gradient(to right, #1e40af, #0f766e); /* dark: blue-900 → teal-900 */
   --video-filter: rgba(15, 23, 42, 0.516); /* blue-800 */
   --brightness: 0.9;
+  --card-bg: linear-gradient(to bottom right, #1e3a8a, #134e4a); /* from-blue-900 to-teal-900 */
+  --card-border: #1e40af; /* blue-800 */
+  --card-border-hover: #2563eb; /* blue-600 */
 }
 
 /* Базові стилі */
@@ -99,7 +105,15 @@ nav {
 .modal-content {
   @apply bg-[var(--background)] text-[var(--foreground)] border-[var(--border-color)] p-4 rounded-lg max-w-[600px] w-[90%];
 }
+.document-card {
+  background-image: var(--card-bg);
+  border: 1px solid var(--card-border);
+  transition: border-color 0.3s ease;
+}
 
+.document-card:hover {
+  border-color: var(--card-border-hover);
+}
 /* Відео фон */
 .video-container {
   /* @apply absolute inset-0 w-screen h-dvh overflow-hidden -z-10; */

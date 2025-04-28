@@ -1,14 +1,12 @@
 const DocumentCard = ({ title, description, filePath, className = "" }) => {
   return (
-    <div
-      className={`document-card  w-full md:w-1/3 xl:w-1/3  aspect-[5/3] ${className}`}
-    >
+    <div className={`w-full md:w-1/3 xl:w-1/3  aspect-[5/3] ${className}`}>
       <div
-        className={`rounded-xl border bg-card m-1 text-card-foreground h-full overflow-hidden cursor-pointer bg-gradient-to-br from-blue-50 to-teal-50 border-blue-200 hover:border-blue-400 transition-all duration-300 shadow-sm hover:shadow-md hover:animate-scale-bounce`}
+        className={`rounded-xl m-1 h-full overflow-hidden cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md hover:animate-scale-bounce`}
       >
-        <div className="p-5 h-full flex flex-col items-start justify-between">
-          <h4 className="text-lg font-semibold">{title}</h4>
-          <p className="text-gray-300 text-sm mb-2">{description}</p>
+        <div className="document-card p-5 h-full flex flex-col items-start justify-between">
+          <h4 className="text-[var(--t-color)]">{title}</h4>
+          <p className="text-[var(--p-color)] text-sm mb-2">{description}</p>
           <a
             href={filePath}
             target="_blank"
