@@ -4,7 +4,7 @@ const DocumentCard = ({ title, description, filePath, className = "" }) => {
       <div
         className={`rounded-xl border bg-card m-1 text-card-foreground h-full overflow-hidden cursor-pointer bg-gradient-to-br from-blue-50 to-teal-50 border-blue-200 hover:border-blue-400 transition-all duration-300 shadow-sm hover:shadow-md hover:animate-scale-bounce`}
       >
-        <div className="p-5 h-full flex flex-col">
+        <div className="p-5 h-full flex flex-colVin">
           <h3 className="text-lg font-semibold">{title}</h3>
           <p className="text-gray-300 text-sm mb-2">{description}</p>
           <a

@@ -10,9 +10,9 @@ export default function AboutPage() {
         <Image
           src="/img/dniester-hydroelectric-station.jpg.jpg"
           alt="Дністровська ГЕС"
-          width={256}
+          width={512}
           height={9999}
-          className="rounded-xl float-right ml-6 mb-4 shadow-xl h-auto w-64"
+          className="rounded-xl w-full xl:w-128 float-none xl:float-right ml-0 xl:ml-6 mb-4 shadow-xl h-auto"
         />
 
         <p>

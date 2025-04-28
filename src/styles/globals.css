@@ -14,13 +14,14 @@
   font-weight: 100 900;
   src: url("/fonts/GeistMonoVF.woff") format("woff");
 }
-
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
 /* Теми через CSS-змінні */
 html {
-  /* --background-image: linear-gradient(#f1f5f9, #dbeafe); */
-  /* --background-image: linear-gradient(rgba(241, 245, 249, 0.9), rgba(219, 234, 254, 0.9)); */
   --background-image: linear-gradient(to bottom right, #f1f5f9, #dbeafe);
-
   --background: rgb(248, 250, 252); /* Додаємо для MobileMenu */
   --foreground: rgb(15, 23, 42);
   --link-color: #1e293b;
@@ -64,15 +65,8 @@ html.dark {
 /* Базові стилі */
 html,
 body {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-  min-height: 100vh;
-  min-width: 100vw;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  @apply text-[10px] sm:text-[16px];
+  @apply box-border flex flex-col min-h-screen w-full max-w-[100vw] overflow-x-hidden m-0 p-0 text-[10px] sm:text-[16px];
+  color: var(--p-color);
 }
 
 body {
@@ -108,7 +102,8 @@ nav {
 
 /* Відео фон */
 .video-container {
-  @apply absolute inset-0 w-screen h-dvh overflow-hidden -z-10;
+  /* @apply absolute inset-0 w-screen h-dvh overflow-hidden -z-10; */
+  @apply absolute inset-0 h-dvh overflow-hidden -z-10;
 }
 
 .video-bg {
