@@ -5,8 +5,8 @@ export default async function AdminLayout({ children }) {
   const role = await getUserRole();
 
   return (
-    <div className="w-dvw mx-auto p-6 bg-white/10 rounded shadow-md">
-      <nav className="w-full h-12 flex gap-4 mb-6 text-fuchsia-200">
+    <div className="w-dvw mx-auto p-6 document-cardrounded shadow-md">
+      <nav className="bg-[var(--card-bg)] w-full h-12 flex gap-4 mb-6 text-fuchsia-200">
         {(role === "moderator" || role === "admin") && (
           <>
             <Link href="/admin/documents">Документи</Link>

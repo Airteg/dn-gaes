@@ -7,10 +7,7 @@ export default function Contacts() {
       <h1 className="text-2xl font-bold text-center mb-4">Контакти</h1>
       <div className="grid gap-4">
         {contacts.map((contact, index) => (
-          <div
-            key={index}
-            className="border border-gray-300 p-4 rounded-md shadow-md"
-          >
+          <div key={index} className="document-card p-4 rounded-md shadow-md">
             <p className="font-bold text-lg mb-2 py-1">
               {contact.organization}
             </p>
