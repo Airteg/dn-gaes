@@ -235,3 +235,6 @@ html.dark .title {
 .scroll-btn {
   @apply z-10 bg-white/80 text-black px-2 py-1 rounded shadow;
 }
+
+@media screen {
+}

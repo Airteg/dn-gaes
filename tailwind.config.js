@@ -1,11 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    // "./src/pages/**/*.{js,ts,jsx,tsx}",
-    // "./src/components/**/*.{js,ts,jsx,tsx}",
-    // "./src/app/**/*.{js,ts,jsx,tsx}",
-    "./src/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     extend: {
       keyframes: {
@@ -17,6 +12,9 @@ module.exports = {
       },
       animation: {
         "scale-bounce": "scale-bounce 0.6s ease-in-out 2",
+      },
+      screens: {
+        touch: { raw: "(pointer: coarse)" },
       },
     },
   },

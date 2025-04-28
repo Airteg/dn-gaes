@@ -25,9 +25,7 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <div className="flex flex-col">
             <Menu />
-            <main className="min-w-full flex flex-1 justify-center mx-auto p-0 overflow-hidden">
-              {children}
-            </main>
+            <main className="flex flex-1 justify-center">{children}</main>
           </div>
         </AuthProvider>
       </body>

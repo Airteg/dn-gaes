@@ -55,6 +55,7 @@ export default function DocumentsPage() {
         <PageHeader
           title="Документи"
           subtitle="Отримайте доступ до нашої повної колекції документів"
+          className=""
         />
         <CategoryList
           categories={categories}
@@ -69,7 +70,6 @@ export default function DocumentsPage() {
           selectedSubcategory={selectedSubcategory}
           onSubcategorySelect={setSelectedSubcategory}
           documents={filteredDocuments}
-          className="w-full flex flex-col lg:flex-row mx-auto p-2 gap-4"
         />
       </DocumentsWrapper>
     </Section>

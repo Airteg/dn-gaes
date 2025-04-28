@@ -9,7 +9,7 @@ const ScrollButton = ({ direction, onClick, className = "" }) => {
   return (
     <button
       onClick={onClick}
-      className={`hidden lg:block absolute ${positionClass} top-1/2 -translate-y-1/2 z-10 transition-all duration-300 px-1 bg-[var(--foreground)]/10 hover:bg-[var(--foreground)]/20 ${className}`}
+      className={`touch:hidden transition-all duration-500 px-1 bg-[var(--foreground)]/10 hover:bg-[var(--foreground)]/20 ${className}`}
       aria-label={ariaLabel}
     >
       <svg
