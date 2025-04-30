@@ -7,7 +7,7 @@ import MobileMenu from "./MobileMenu";
 export default async function Menu() {
   const session = await auth();
   const user = session?.user;
-
+  console.log("user", user?.role);
   return (
     <nav className="bg-[var(--nav-bg)] p-4">
       {/* MobileMenu — рендериться завжди, але показує себе сам */}
@@ -32,9 +32,11 @@ export default async function Menu() {
           <NavLink href="/contacts">
             <span> Контакти</span>
           </NavLink>
-          <NavLink href="/admin">
-            <span> Адміністрування</span>
-          </NavLink>
+          {(user?.role === "admin" || user?.role === "moderator") && (
+            <NavLink href="/admin">
+              <span> Адміністрування</span>
+            </NavLink>
+          )}
         </div>
 
         {/* Право: Юзер і Тема */}
