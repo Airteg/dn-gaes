@@ -12,22 +12,24 @@ export default function LoginPage() {
     "w-full mt-4 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500";
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Запобігаємо перезавантаженню сторінки
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
     const result = await signIn("credentials", {
       email,
       password,
-      callbackUrl: "/", // Перенаправлення на головну після входу
-      redirect: true,
-      // Щоб побачити результат у консолі, якщо щось не так,
-      // redirect: false,
+      callbackUrl: "/",
+      redirect: false,
     });
-    // ... і розкоментувати код нижче
-    // if (result?.error) {
-    //   console.log("Login failed:", result.error);
-    // } else if (result?.ok) {
-    //   console.log("Login successful:", result);
-    //   window.location.href = result.url; // 🔁 вручну перенаправляємо
-    // }
+
+    if (result?.error) {
+      setError("Невірний email або пароль");
+    } else if (result?.ok) {
+      window.location.href = result.url;
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -63,7 +65,7 @@ export default function LoginPage() {
         {error && <p className="text-red-600 mt-4 text-center">{error}</p>}
 
         <button
-          onClick={() => signIn("google")}
+          onClick={() => signIn("google", { callbackUrl: "/" })}
           className="w-full mt-4 bg-red-600 text-white py-2 rounded hover:bg-red-700"
         >
           Увійти через Google
