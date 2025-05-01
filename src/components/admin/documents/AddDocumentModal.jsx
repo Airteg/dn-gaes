@@ -48,7 +48,13 @@ export default function AddDocumentModal({ isOpen, onClose }) {
     });
 
     if (res.ok) {
-      setForm({ title: "", description: "", filePath: "", category: "" });
+      setForm({
+        title: "",
+        description: "",
+        filePath: "",
+        category: "",
+        subcategory: "",
+      });
       setFile(null);
       await queryClient.invalidateQueries({ queryKey: ["documents"] });
       onClose();
@@ -97,6 +103,13 @@ export default function AddDocumentModal({ isOpen, onClose }) {
             placeholder="Категорія"
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
+            className="w-full border rounded p-2"
+          />
+          <input
+            type="text"
+            placeholder="Підкатегорія"
+            value={form.subcategory}
+            onChange={(e) => setForm({ ...form, subcategory: e.target.value })}
             className="w-full border rounded p-2"
           />
 

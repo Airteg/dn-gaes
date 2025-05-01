@@ -1,4 +1,10 @@
-const DocumentCard = ({ title, description, filePath, className = "" }) => {
+const DocumentCard = ({
+  title,
+  description,
+  filePath,
+  updatedAt,
+  className = "",
+}) => {
   return (
     <div className={`w-full md:w-1/3 xl:w-1/3  aspect-[5/3] ${className}`}>
       <div
@@ -7,6 +13,14 @@ const DocumentCard = ({ title, description, filePath, className = "" }) => {
         <div className="document-card p-5 h-full flex flex-col items-start justify-between">
           <h4 className="text-[var(--t-color)]">{title}</h4>
           <p className="text-[var(--p-color)] text-sm mb-2">{description}</p>
+          <p className="text-[var(--p-color)] text-sm mb-2">
+            Від:{" "}
+            {new Date(updatedAt).toLocaleDateString("uk-UA", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })}
+          </p>
           <a
             href={filePath}
             target="_blank"
